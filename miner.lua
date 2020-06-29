@@ -513,6 +513,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     end
   end
   if forcibly then
+    print('ищем в контейнере')
     report('tool search in container')
     if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
       robot.select(1) -- выбрать первый слот
@@ -530,10 +531,10 @@ home = function(forcibly, interrupt) -- переход к начальной т�
       end
       chest.equip() -- экипировать
     end
+    print('пробуем зарядить')
     report('attempt to repair tool')
     if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
-      print('tool break')
-      for side = 1, 4 do -- перебрать все стороны
+      for side = 1, 3 do -- перебрать все стороны
         --local name = chest.getInventoryName(3) -- получить имя инвенторя
         size = chest.getInventorySize(3)
         if size == 2 then -- сравнить имя
@@ -551,6 +552,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
                   chest.equip() -- экипировать
                   break -- остановить зарядку
                 else
+                  print('заряд '..math.floor((n_charge+1)/max_charge*100)..'% charged')
                   report('tool is '..math.floor((n_charge+1)/max_charge*100)..'% charged')
                 end
               else -- если инструмент не чинится
