@@ -532,6 +532,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     end
     report('attempt to repair tool')
     if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
+      robot.turnAround()
       for side = 1, 3 do -- перебрать все стороны
         --local name = chest.getInventoryName(3) -- получить имя инвенторя
         --if name == 'opencomputers:charger' or name == 'tile.oc.charger' then -- сравнить имя
