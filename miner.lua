@@ -243,9 +243,6 @@ calibration = function() -- калибровка при запуске
     report('bottom solid block is not detected', true)
   elseif stat_tool then
     report('нет инструмента или почти изношен', true)
-  else
-    print(stat_tool)
-    report('инструмент готов', true)
   end
   local clist = computer.getDeviceInfo()
   for i, j in pairs(clist) do
