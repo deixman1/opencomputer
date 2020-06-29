@@ -67,7 +67,7 @@ report = function(message, stop) -- рапорт о состоянии
     end
     --error(message, 0) -- остановить работу программы
     print(message)
-    do return end
+    os.exit()
   end
 end
 
