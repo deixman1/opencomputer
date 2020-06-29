@@ -560,7 +560,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
           end
         --else
           --turn() -- повернуться
-        --end
+        end
       end
       while robot.durability() < 0.3 do
         report('need a new tool')
