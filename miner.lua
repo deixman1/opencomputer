@@ -31,7 +31,7 @@ local function add_component(name) -- получение прокси компо
 end
 
 -- загрузка компонентов --
-local controller = add_component('inventory_controller')
+local chest = add_component('inventory_controller')
 local chunkloader = add_component('chunkloader')
 local generator = add_component('generator')
 local crafting = add_component('crafting')
@@ -237,7 +237,7 @@ end
 
 calibration = function() -- калибровка при запуске
   local stat_tool = robot.durability() <= 0.1
-  if not controller then -- проверить наличие контроллера инвентаря
+  if not chest then -- проверить наличие контроллера инвентаря
     report('inventory controller not detected', true)
   elseif not geolyzer then -- проверить наличие геосканера
     report('geolyzer not detected', true)
@@ -322,7 +322,7 @@ sorter = function(pack) -- сортировка лута
   ------- сброс мусора -------
   local empty, available = 0, {} -- создать счетчик пустых слотов и доступных для упаковки
   for slot = 1, inventory do -- пройти по слотам инвентаря
-    local item = controller.getStackInInternalSlot(slot) -- получить информацию о предмете
+    local item = chest.getStackInInternalSlot(slot) -- получить информацию о предмете
     if item then -- если есть предмет
       local name = item.name:gsub('%g+:', '')
       if tails[name] then -- проверить на совпадение в списке отходов
@@ -346,7 +346,7 @@ sorter = function(pack) -- сортировка лута
     if empty < 10 then -- если пустых слотов меньше 10
       empty = 10-empty -- увеличить количество пустых слотов для обратного отсчета
       for slot = 1, inventory do -- просканировать инвентарь
-        local item = controller.getStackInInternalSlot(slot)
+        local item = chest.getStackInInternalSlot(slot)
         if item then -- если слот не пуст
           if not wlist[item.name] then -- проверка имени, чтобы не выкинуть важный предмет в лаву
             local name = item.name:gsub('%g+:', '') -- отформатировать имя
@@ -387,7 +387,7 @@ sorter = function(pack) -- сортировка лута
             end
           end
           for slot = 4, inventory do -- цикл поиска фрагментов
-            local item = controller.getStackInInternalSlot(slot) -- получить информацию о предмете
+            local item = chest.getStackInInternalSlot(slot) -- получить информацию о предмете
             if item and (slot == 4 or slot == 8 or slot > 11) then -- если есть предмет вне рабочей зоны
               if o == item.name:gsub('%g+:', '') then -- если предмет совпадает
                 robot.select(slot) -- при совпадении выбрать слот
@@ -431,7 +431,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
   ignore_check = true
   local enderchest -- обнулить слот с эндерсундуком
   for slot = 1, inventory do -- просканировать инвентарь
-    local item = controller.getStackInInternalSlot(slot) -- получить информацию о слоте
+    local item = chest.getStackInInternalSlot(slot) -- получить информацию о слоте
     if item then -- если есть предмет
       if item.name == 'enderstorage:ender_storage' then -- если есть эндерсундук
         enderchest = slot -- задать слот
@@ -453,7 +453,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
   local size = nil -- обнулить размер контейнера
   while true do -- войти в бесконечный цикл
     for side = 1, 4 do -- поиск контейнера
-      size = controller.getInventorySize(3) -- получение размера инвентаря
+      size = chest.getInventorySize(3) -- получение размера инвентаря
       if size and size>26 then -- если контейнер найден
         break -- прервать поиск
       end
@@ -467,7 +467,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     end
   end
   for slot = 1, inventory do -- обойти весь инвентарь
-    local item = controller.getStackInInternalSlot(slot)
+    local item = chest.getStackInInternalSlot(slot)
     if item then -- если слот не пуст
       if not wlist[item.name] then -- если предмет не в белом списке
         robot.select(slot) -- выбрать слот
@@ -483,16 +483,16 @@ home = function(forcibly, interrupt) -- переход к начальной т�
   end
   if crafting then -- если есть верстак, забрать предметы из сундука и упаковать
     for slot = 1, size do -- обход слотов контейнера
-      local item = controller.getStackInSlot(3, slot) -- получить информацию о пердмете
+      local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
       if item then -- если есть предмет
         if fragments[item.name:gsub('%g+:', '')] then -- если есть совпадение
-          controller.suckFromSlot(3, slot) -- забрать предметы
+          chest.suckFromSlot(3, slot) -- забрать предметы
         end
       end
     end
     sorter(true) -- упаковать
     for slot = 1, inventory do -- обойти весь инвентарь
-      local item = controller.getStackInInternalSlot(slot)
+      local item = chest.getStackInInternalSlot(slot)
       if item then -- если слот не пуст
         if not wlist[item.name] then -- если предмет не в белом списке
           robot.select(slot) -- выбрать слот
@@ -503,10 +503,10 @@ home = function(forcibly, interrupt) -- переход к начальной т�
   end
   if generator and not forcibly then -- если есть генератор
     for slot = 1, size do -- просканировать контейнер
-      local item = controller.getStackInSlot(3, slot) -- получить информацию о пердмете
+      local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
       if item then -- если есть предмет
         if item.name:sub(11, 15) == 'coal' then -- если в слоте уголь
-          controller.suckFromSlot(3, slot) -- взять
+          chest.suckFromSlot(3, slot) -- взять
           break -- выйти из цикла
         end
       end
@@ -516,37 +516,37 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     report('tool search in container')
     if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
       robot.select(1) -- выбрать первый слот
-      controller.equip() -- поместить инструмент в инвентарь
-      local tool = controller.getStackInInternalSlot(1) -- получить данные инструмента
+      chest.equip() -- поместить инструмент в инвентарь
+      local tool = chest.getStackInInternalSlot(1) -- получить данные инструмента
       for slot = 1, size do
-        local item = controller.getStackInSlot(3, slot)
+        local item = chest.getStackInSlot(3, slot)
         if item then
           if item.name == tool.name and item.damage < tool.damage then
             robot.drop(3)
-            controller.suckFromSlot(3, slot)
+            chest.suckFromSlot(3, slot)
             break
           end
         end
       end
-      controller.equip() -- экипировать
+      chest.equip() -- экипировать
     end
     report('attempt to repair tool')
     if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
       for side = 1, 3 do -- перебрать все стороны
-        local name = controller.getInventoryName(3) -- получить имя инвенторя
+        local name = chest.getInventoryName(3) -- получить имя инвенторя
         if name == 'opencomputers:charger' or name == 'tile.oc.charger' then -- сравнить имя
           robot.select(1) -- выбрать слот
-          controller.equip() -- достать инструмент
+          chest.equip() -- достать инструмент
           if robot.drop(3) then -- если получилось засунуть инструмент в зарядник
-            local charge = controller.getStackInSlot(3, 1).charge
-            local max_charge = controller.getStackInSlot(3, 1).maxCharge
+            local charge = chest.getStackInSlot(3, 1).charge
+            local max_charge = chest.getStackInSlot(3, 1).maxCharge
             while true do
               sleep(30)
-              local n_charge = controller.getStackInSlot(3, 1).charge -- получить заряд
+              local n_charge = chest.getStackInSlot(3, 1).charge -- получить заряд
               if charge then
                 if n_charge == max_charge then
                   robot.suck(3) -- забрать предмет
-                  controller.equip() -- экипировать
+                  chest.equip() -- экипировать
                   break -- остановить зарядку
                 else
                   report('tool is '..math.floor((n_charge+1)/max_charge*100)..'% charged')
