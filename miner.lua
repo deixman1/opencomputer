@@ -234,7 +234,7 @@ scan = function(xx, zz) -- сканирование квадрата x8 отно
 end
 
 calibration = function() -- калибровка при запуске
-  local stat_tool = robot.durability() >= 0.1
+  local stat_tool = robot.durability() <= 0.1
   if not controller then -- проверить наличие контроллера инвентаря
     report('inventory controller not detected', true)
   elseif not geolyzer then -- проверить наличие геосканера
