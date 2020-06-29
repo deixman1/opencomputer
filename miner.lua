@@ -56,16 +56,18 @@ end
 report = function(message, stop) -- рапорт о состоянии
   message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
   if modem then -- если есть модем
-    modem.broadcast(port, message) -- послать сообщение через модем
+    --modem.broadcast(port, message) -- послать сообщение через модем
   elseif tunnel then -- если есть связанная карта
-    tunnel.send(message) -- послать сообщение через нее
+    --tunnel.send(message) -- послать сообщение через нее
   end
   computer.beep() -- пикнуть
   if stop then -- если есть флаг завершения
     if chunkloader then
       chunkloader.setActive(false)
     end
-    error(message,0) -- остановить работу программы
+    --error(message, 0) -- остановить работу программы
+    print(message)
+    return
   end
 end
 
