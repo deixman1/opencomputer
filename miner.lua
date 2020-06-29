@@ -558,9 +558,9 @@ home = function(forcibly, interrupt) -- переход к начальной т�
           else
             report('tool could not be repaired', true) -- остановить работу
           end
-        else
-          turn() -- повернуться
-        end
+        --else
+          --turn() -- повернуться
+        --end
       end
       while robot.durability() < 0.3 do
         report('need a new tool')
