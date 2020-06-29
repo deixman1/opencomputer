@@ -532,10 +532,11 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     end
     report('attempt to repair tool')
     if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
-      turn()
-      --for side = 1, 3 do -- перебрать все стороны
+      print('tool break')
+      for side = 1, 4 do -- перебрать все стороны
         --local name = chest.getInventoryName(3) -- получить имя инвенторя
-        --if name == 'opencomputers:charger' or name == 'tile.oc.charger' then -- сравнить имя
+        size = chest.getInventorySize(3)
+        if size == 2 then -- сравнить имя
           robot.select(1) -- выбрать слот
           chest.equip() -- достать инструмент
           if robot.drop(3) then -- если получилось засунуть инструмент в зарядник
@@ -559,14 +560,14 @@ home = function(forcibly, interrupt) -- переход к начальной т�
           else
             report('tool could not be repaired', true) -- остановить работу
           end
-        --else
-          --turn() -- повернуться
-        --end
-      --end
-      --while robot.durability() < 0.3 do
-        report('need a new tool', true)
-        --sleep(30)
-      --end
+        else
+          turn() -- повернуться
+        end
+      end
+      while robot.durability() < 0.3 do
+        report('need a new tool')
+        sleep(30)
+      end
     end
   end
   if enderchest and not forcibly then
