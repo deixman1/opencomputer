@@ -1,8 +1,8 @@
 local component = require('component') -- подгрузить обертку из OpenOS
 local computer = require('computer')
-local chunks = 9 -- количество чанков для добычи
+local chunks = 1 -- количество чанков для добычи
 local min, max = 2.2, 40 -- минимальная и максимальная плотность
-local port = 1 -- порт для взаимодействия с роботом
+local port = 10 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
 local steps, turns = 0, 0 -- debug
 local WORLD = {x = {}, y = {}, z = {}} -- таблица меток
@@ -240,7 +240,7 @@ calibration = function() -- калибровка при запуске
     report('geolyzer not detected', true)
   elseif not robot.detect(0) then
     report('bottom solid block is not detected', true)
-  elseif not robot.durability() then
+  elseif robot.durability() <= 0.9 then
     report('there is no suitable tool in the manipulator', true)
   end
   local clist = computer.getDeviceInfo()
