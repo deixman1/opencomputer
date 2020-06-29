@@ -235,6 +235,7 @@ end
 
 calibration = function() -- калибровка при запуске
   local stat_tool = robot.durability() <= 0.1
+  print(stat_tool)
   if not controller then -- проверить наличие контроллера инвентаря
     report('inventory controller not detected', true)
   elseif not geolyzer then -- проверить наличие геосканера
