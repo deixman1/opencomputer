@@ -499,18 +499,23 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     local item = chest.getStackInInternalSlot(slot)
     if item then -- если слот не пуст
       if not wlist[item.name] then -- если предмет не в белом списке
-        robot.select(slot) -- выбрать слот
-        local a, b = robot.drop(3) -- сбросить в контейнер
+      	while item do
+      		print('ожидание выгрузки')
+        	robot.select(slot) -- выбрать слот
+        	sleep(30)
+        	item = chest.getStackInInternalSlot(slot)
+      	end
+        --[[local a, b = robot.drop(3) -- сбросить в контейнер
         if not a and b == 'inventory full' then -- если контейнер заполнен
           while not robot.drop(3) do -- ждать, пока не освободится
             report(b) -- послать сообщение
             sleep(30) -- подождать
           end
-        end
+        end]]--
       end
     end
   end
-  if crafting then -- если есть верстак, забрать предметы из сундука и упаковать
+  --[[if crafting then -- если есть верстак, забрать предметы из сундука и упаковать
     for slot = 1, size do -- обход слотов контейнера
       local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
       if item then -- если есть предмет
@@ -529,7 +534,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
         end
       end
     end
-  end
+  end]]--
   if generator and not forcibly then -- если есть генератор
     for slot = 1, size do -- просканировать контейнер
       local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
