@@ -564,14 +564,15 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			print('ебаный сервер, ждем зарядки инструмента')
 			robot.select(1)
 			chest.equip()
-			local now_charge = chest.getStackInInternalSlot(1).charge
-			local max_charge = chest.getStackInInternalSlot(1).maxCharge
-			while not now_charge == max_charge do
-				local item = chest.getStackInInternalSlot(1)
+			local item = chest.getStackInInternalSlot(1)
+			local now_charge = item.charge
+			local max_charge = item.maxCharge
+			while not(now_charge == max_charge) do
 				print('ожидаю зарядки инструмента')
 				sleep(30)
+				item = chest.getStackInInternalSlot(1)
 				if item then
-					now_charge = chest.getStackInInternalSlot(1).charge
+					now_charge = item.charge
 				else
 					sleep(30)
 				end
