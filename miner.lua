@@ -547,7 +547,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     end
   end
   if forcibly then
-    print('ищем в контейнере')
+    --[[print('ищем в контейнере')
     report('tool search in container')
     if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
       robot.select(1) -- выбрать первый слот
@@ -564,11 +564,27 @@ home = function(forcibly, interrupt) -- переход к начальной т�
         end
       end
       chest.equip() -- экипировать
-    end
+    end]]--
     print('пробуем зарядить')
     report('attempt to repair tool')
     if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
-      for side = 1, 3 do -- перебрать все стороны
+    	print('ебаный сервер, ждем зарядки инструмента')
+    	robot.select(1)
+    	chest.equip()
+    	local now_charge = chest.getStackInInternalSlot(1).charge
+    	local max_charge = chest.getStackInInternalSlot(1).maxCharge
+    	while not now_charge == max_charge do
+    		local item = chest.getStackInInternalSlot(1)
+    		print('ожидаю зарядки инструмента')
+    		sleep(30)
+    		if item then
+				now_charge = chest.getStackInInternalSlot(1).charge
+    		else
+				sleep(30)
+    		end
+    	end
+    	chest.equip()
+      --[[for side = 1, 3 do -- перебрать все стороны
         --local name = chest.getInventoryName(3) -- получить имя инвенторя
         size = chest.getInventorySize(3)
         if size == 2 then -- сравнить имя
@@ -601,7 +617,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
           end
         else
           turn() -- повернуться
-        end
+        end]]--
       end
       while robot.durability() < 0.3 do
         print('нужен инструмент')
