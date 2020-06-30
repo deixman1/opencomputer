@@ -495,17 +495,16 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			break -- продолжить работу
 		end
 	end]]--
+	print('ожидание выгрузки')
 	for slot = 1, inventory do -- обойти весь инвентарь
 		local item = chest.getStackInInternalSlot(slot)
 		if item then -- если слот не пуст
 			if not wlist[item.name] then -- если предмет не в белом списке
-				print('ожидание выгрузки')
 				while item do
 			  	robot.select(slot) -- выбрать слот
 			  	sleep(30)
 			  	item = chest.getStackInInternalSlot(slot)
 				end
-				print('выгружено')
 				--[[local a, b = robot.drop(3) -- сбросить в контейнер
 				if not a and b == 'inventory full' then -- если контейнер заполнен
 				  while not robot.drop(3) do -- ждать, пока не освободится
@@ -516,6 +515,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			end
 		end
 	end
+	print('выгружено')
 	--[[if crafting then -- если есть верстак, забрать предметы из сундука и упаковать
 	  for slot = 1, size do -- обход слотов контейнера
 	    local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
