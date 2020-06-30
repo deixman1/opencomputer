@@ -84,12 +84,12 @@ check = function(forcibly) -- проверка инструмента, бата�
     if robot.durability()/W_R < delta then -- если инструмент изношен
       report('tool is worn')
       ignore_check = true
-      home(true) -- отправиться домой
+      home(true, false) -- отправиться домой
     end
     if delta*E_C > computer.energy() then -- проверка уровня энергии
       report('battery is low')
       ignore_check = true
-      home(true) -- отправиться домой
+      home(true, false) -- отправиться домой
     end
     if energy_level() < 0.3 then -- если энергии меньше 30%
       local time = os.date('*t')
@@ -550,16 +550,19 @@ home = function(forcibly, interrupt) -- переход к начальной т�
                 if n_charge == max_charge then
                   robot.suck(3) -- забрать предмет
                   chest.equip() -- экипировать
+                  print('заряжено')
                   break -- остановить зарядку
                 else
                   print('заряд '..math.floor((n_charge+1)/max_charge*100)..'% charged')
                   report('tool is '..math.floor((n_charge+1)/max_charge*100)..'% charged')
                 end
               else -- если инструмент не чинится
+                print('не чинится')
                 report('tool could not be charged', true) -- остановить работу
               end
             end
           else
+            print('не чинится')
             report('tool could not be repaired', true) -- остановить работу
           end
         else
@@ -567,6 +570,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
         end
       end
       while robot.durability() < 0.3 do
+        print('нужен инструмент')
         report('need a new tool')
         sleep(30)
       end
@@ -576,12 +580,14 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     robot.swing(3) -- забрать сундук
   else
     while energy_level() < 0.98 do -- ждать полного заряда батареи
+      report('заряжаюсь')
       report('charging')
       sleep(30)
     end
   end
   ignore_check = nil
   if not interrupt then
+    report('работаем')
     report('return to work')
     go(0, -2, 0)
     go(x, y, z)
