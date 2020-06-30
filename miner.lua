@@ -147,6 +147,7 @@ end
 
 step = function(side, ignore) -- функция движения на 1 блок
   if side == 1 then
+  	print(geolyzer.analyze(side).name)
   	if geolyzer.analyze(side).name == 'ThermalDynamics:ThermalDynamics_32' then
   		do return end
   	end
@@ -292,9 +293,7 @@ calibration = function() -- калибровка при запуске
   print('получить уровень износа/разряда инструмента')
   print('расчет расхода энергии за блок')
   while energy == robot.durability() do -- пока не обнаружена разница
-  	print('установить блок')
     robot.place(3) -- установить блок
-    print('разрушить блок')
     robot.swing(3) -- разрушить блок
   end
   print('записать результат')
@@ -305,18 +304,12 @@ calibration = function() -- калибровка при запуске
   D = nil -- обнуление направления
   print('проверка всех направлений')
   for s = 1, #sides do -- проверка всех направлений
-  	print('проверить наличие блока перед носом')
     if robot.detect(3) or robot.place(3) then -- проверить наличие блока перед носом
-      print('сделать первый скан А')
       local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
-      print('сломать блок')
       robot.swing(3) -- сломать блок
-      print('сделать второй скан В')
       local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
-      print('обход смежных блоков')
       for n = 2, 8, 2 do -- обойти смежные блоки в таблице
         if math.ceil(B[n])-math.ceil(A[n])<0 then -- если блок исчез
-          print('блок исчез, установить новое направление, выйти из цикла')
           D = sides[n/2] -- установить новое направление
           break -- выйти из цикла
         end
