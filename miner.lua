@@ -146,12 +146,6 @@ check = function(forcibly) -- проверка инструмента, бата�
 end
 
 step = function(side, ignore) -- функция движения на 1 блок
-  if side == 1 then
-  	print(geolyzer.analyze(side).name)
-  	if geolyzer.analyze(side).name == 'ThermalDynamics:ThermalDynamics_32' then
-  		do return end
-  	end
-  end
   local result, obstacle = robot.swing(side) 
   if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
     home(true) -- запустить завершающую функцию
@@ -343,7 +337,7 @@ end
 
 sorter = function(pack) -- сортировка лута
   robot.swing(0) -- освободить место для мусора
-  robot.swing(1) -- освободить место для буфера
+  --robot.swing(1) -- освободить место для буфера
   ------- сброс мусора -------
   local empty, available = 0, {} -- создать счетчик пустых слотов и доступных для упаковки
   for slot = 1, inventory do -- пройти по слотам инвентаря
@@ -564,9 +558,9 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		  end
 		  chest.equip() -- экипировать
 		end]]--
-		print('пробуем зарядить')
-		report('attempt to repair tool')
-		if robot.durability() < 0.9 then -- если инструмент не заменился на лучший
+		if robot.durability() < 0.99 then -- если инструмент не заменился на лучший
+			print('пробуем зарядить')
+			report('attempt to repair tool')
 			print('ебаный сервер, ждем зарядки инструмента')
 			robot.select(1)
 			chest.equip()
@@ -618,7 +612,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			    turn() -- повернуться
 			  end]]--
 		end
-		while robot.durability() < 0.9 do
+		while robot.durability() < 0.99 do
 			print('инструмент не заряжается')
 			report('need a new tool')
 			sleep(30)
