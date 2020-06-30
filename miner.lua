@@ -453,196 +453,195 @@ sorter = function(pack) -- сортировка лута
 end
 
 home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
-  local x, y, z, d
-  print('выгрузка руды')
-  report('ore unloading')
-  ignore_check = true
-  local enderchest -- обнулить слот с эндерсундуком
-  for slot = 1, inventory do -- просканировать инвентарь
-    local item = chest.getStackInInternalSlot(slot) -- получить информацию о слоте
-    if item then -- если есть предмет
-      if item.name == 'enderstorage:ender_storage' then -- если есть эндерсундук
-        enderchest = slot -- задать слот
-        break -- прервать поиск
-      end
-    end
-  end
-  if enderchest and not forcibly then -- если есть сундук и нет принудительного возвращения домой
-    -- step(1) -- подняться на 1 блок
-    robot.swing(3) -- освободить место для сундука
-    robot.select(enderchest) -- выбрать сундук
-    robot.place(3) -- поставить сундук
-  else
-    x, y, z, d = X, Y, Z, D
-    go(0, -2, 0)
-    go(0, 0, 0)
-  end
-  sorter() -- сортировка инвентаря
-  local size = nil -- обнулить размер контейнера
-  while true do -- войти в бесконечный цикл
-    for side = 1, 4 do -- поиск контейнера
-      size = chest.getInventorySize(3) -- получение размера инвентаря
-      if size and size>26 then -- если контейнер найден
-        break -- прервать поиск
-      end
-      turn() -- повернуться
-    end
-    if not size or size<26 then -- если контейнер не найден
-      print('контейненр не найден')
-      report('container not found') -- послать сообщение
-      sleep(30)
-    else
-      break -- продолжить работу
-    end
-  end
-  for slot = 1, inventory do -- обойти весь инвентарь
-    local item = chest.getStackInInternalSlot(slot)
-    if item then -- если слот не пуст
-      if not wlist[item.name] then -- если предмет не в белом списке
-      	while item do
-      		print('ожидание выгрузки')
-        	robot.select(slot) -- выбрать слот
-        	sleep(30)
-        	item = chest.getStackInInternalSlot(slot)
-      	end
-        --[[local a, b = robot.drop(3) -- сбросить в контейнер
-        if not a and b == 'inventory full' then -- если контейнер заполнен
-          while not robot.drop(3) do -- ждать, пока не освободится
-            report(b) -- послать сообщение
-            sleep(30) -- подождать
-          end
-        end]]--
-      end
-    end
-  end
-  --[[if crafting then -- если есть верстак, забрать предметы из сундука и упаковать
-    for slot = 1, size do -- обход слотов контейнера
-      local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
-      if item then -- если есть предмет
-        if fragments[item.name:gsub('%g+:', '')] then -- если есть совпадение
-          chest.suckFromSlot(3, slot) -- забрать предметы
-        end
-      end
-    end
-    sorter(true) -- упаковать
-    for slot = 1, inventory do -- обойти весь инвентарь
-      local item = chest.getStackInInternalSlot(slot)
-      if item then -- если слот не пуст
-        if not wlist[item.name] then -- если предмет не в белом списке
-          robot.select(slot) -- выбрать слот
-          robot.drop(3) -- сбрость в контейнер
-        end
-      end
-    end
-  end]]--
-  if generator and not forcibly then -- если есть генератор
-    for slot = 1, size do -- просканировать контейнер
-      local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
-      if item then -- если есть предмет
-        if item.name:sub(11, 15) == 'coal' then -- если в слоте уголь
-          chest.suckFromSlot(3, slot) -- взять
-          break -- выйти из цикла
-        end
-      end
-    end
-  end
-  if forcibly then
-    --[[print('ищем в контейнере')
-    report('tool search in container')
-    if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
-      robot.select(1) -- выбрать первый слот
-      chest.equip() -- поместить инструмент в инвентарь
-      local tool = chest.getStackInInternalSlot(1) -- получить данные инструмента
-      for slot = 1, size do
-        local item = chest.getStackInSlot(3, slot)
-        if item then
-          if item.name == tool.name and item.damage < tool.damage then
-            robot.drop(3)
-            chest.suckFromSlot(3, slot)
-            break
-          end
-        end
-      end
-      chest.equip() -- экипировать
-    end]]--
-    print('пробуем зарядить')
-    report('attempt to repair tool')
-    if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
-    	print('ебаный сервер, ждем зарядки инструмента')
-    	robot.select(1)
-    	chest.equip()
-    	local now_charge = chest.getStackInInternalSlot(1).charge
-    	local max_charge = chest.getStackInInternalSlot(1).maxCharge
-    	while not now_charge == max_charge do
-    		local item = chest.getStackInInternalSlot(1)
-    		print('ожидаю зарядки инструмента')
-    		sleep(30)
-    		if item then
-				now_charge = chest.getStackInInternalSlot(1).charge
-    		else
+	local x, y, z, d
+	print('выгрузка руды')
+	report('ore unloading')
+	ignore_check = true
+	local enderchest -- обнулить слот с эндерсундуком
+	for slot = 1, inventory do -- просканировать инвентарь
+		local item = chest.getStackInInternalSlot(slot) -- получить информацию о слоте
+		if item then -- если есть предмет
+			if item.name == 'enderstorage:ender_storage' then -- если есть эндерсундук
+				enderchest = slot -- задать слот
+				break -- прервать поиск
+			end
+		end
+	end
+	if enderchest and not forcibly then -- если есть сундук и нет принудительного возвращения домой
+		-- step(1) -- подняться на 1 блок
+		robot.swing(3) -- освободить место для сундука
+		robot.select(enderchest) -- выбрать сундук
+		robot.place(3) -- поставить сундук
+	else
+		x, y, z, d = X, Y, Z, D
+		go(0, -2, 0)
+		go(0, 0, 0)
+	end
+	sorter() -- сортировка инвентаря
+	local size = nil -- обнулить размер контейнера
+	while true do -- войти в бесконечный цикл
+		for side = 1, 4 do -- поиск контейнера
+			size = chest.getInventorySize(3) -- получение размера инвентаря
+			if size and size>26 then -- если контейнер найден
+			  break -- прервать поиск
+			end
+			turn() -- повернуться
+		end
+		if not size or size<26 then -- если контейнер не найден
+			print('контейненр не найден')
+			report('container not found') -- послать сообщение
+			sleep(30)
+		else
+			break -- продолжить работу
+		end
+	end
+	for slot = 1, inventory do -- обойти весь инвентарь
+		local item = chest.getStackInInternalSlot(slot)
+		if item then -- если слот не пуст
+			if not wlist[item.name] then -- если предмет не в белом списке
+				while item do
+					print('ожидание выгрузки')
+			  	robot.select(slot) -- выбрать слот
+			  	sleep(30)
+			  	item = chest.getStackInInternalSlot(slot)
+				end
+				--[[local a, b = robot.drop(3) -- сбросить в контейнер
+				if not a and b == 'inventory full' then -- если контейнер заполнен
+				  while not robot.drop(3) do -- ждать, пока не освободится
+				    report(b) -- послать сообщение
+				    sleep(30) -- подождать
+				  end
+				end]]--
+			end
+		end
+	end
+	--[[if crafting then -- если есть верстак, забрать предметы из сундука и упаковать
+	  for slot = 1, size do -- обход слотов контейнера
+	    local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
+	    if item then -- если есть предмет
+	      if fragments[item.name:gsub('%g+:', '')] then -- если есть совпадение
+	        chest.suckFromSlot(3, slot) -- забрать предметы
+	      end
+	    end
+	  end
+	  sorter(true) -- упаковать
+	  for slot = 1, inventory do -- обойти весь инвентарь
+	    local item = chest.getStackInInternalSlot(slot)
+	    if item then -- если слот не пуст
+	      if not wlist[item.name] then -- если предмет не в белом списке
+	        robot.select(slot) -- выбрать слот
+	        robot.drop(3) -- сбрость в контейнер
+	      end
+	    end
+	  end
+	end]]--
+	if generator and not forcibly then -- если есть генератор
+		for slot = 1, size do -- просканировать контейнер
+			local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
+			if item then -- если есть предмет
+				if item.name:sub(11, 15) == 'coal' then -- если в слоте уголь
+					chest.suckFromSlot(3, slot) -- взять
+			    	break -- выйти из цикла
+			  	end
+			end
+		end
+	end
+	if forcibly then
+		--[[print('ищем в контейнере')
+		report('tool search in container')
+		if robot.durability() < 0.3 then -- если прочность инструмента меньше 30%
+		  robot.select(1) -- выбрать первый слот
+		  chest.equip() -- поместить инструмент в инвентарь
+		  local tool = chest.getStackInInternalSlot(1) -- получить данные инструмента
+		  for slot = 1, size do
+		    local item = chest.getStackInSlot(3, slot)
+		    if item then
+		      if item.name == tool.name and item.damage < tool.damage then
+		        robot.drop(3)
+		        chest.suckFromSlot(3, slot)
+		        break
+		      end
+		    end
+		  end
+		  chest.equip() -- экипировать
+		end]]--
+		print('пробуем зарядить')
+		report('attempt to repair tool')
+		if robot.durability() < 0.3 then -- если инструмент не заменился на лучший
+			print('ебаный сервер, ждем зарядки инструмента')
+			robot.select(1)
+			chest.equip()
+			local now_charge = chest.getStackInInternalSlot(1).charge
+			local max_charge = chest.getStackInInternalSlot(1).maxCharge
+			while not now_charge == max_charge do
+				local item = chest.getStackInInternalSlot(1)
+				print('ожидаю зарядки инструмента')
 				sleep(30)
-    		end
-    	end
-    	chest.equip()
-      --[[for side = 1, 3 do -- перебрать все стороны
-        --local name = chest.getInventoryName(3) -- получить имя инвенторя
-        size = chest.getInventorySize(3)
-        if size == 2 then -- сравнить имя
-          robot.select(1) -- выбрать слот
-          chest.equip() -- достать инструмент
-          if robot.drop(3) then -- если получилось засунуть инструмент в зарядник
-            local charge = chest.getStackInSlot(3, 1).charge
-            local max_charge = chest.getStackInSlot(3, 1).maxCharge
-            while true do
-              sleep(30)
-              local n_charge = chest.getStackInSlot(3, 1).charge -- получить заряд
-              if charge then
-                if n_charge == max_charge then
-                  robot.suck(3) -- забрать предмет
-                  chest.equip() -- экипировать
-                  print('заряжено')
-                  break -- остановить зарядку
-                else
-                  print('заряд '..math.floor((n_charge+1)/max_charge*100)..'% charged')
-                  report('tool is '..math.floor((n_charge+1)/max_charge*100)..'% charged')
-                end
-              else -- если инструмент не чинится
-                print('не чинится')
-                report('tool could not be charged', true) -- остановить работу
-              end
-            end
-          else
-            print('не чинится')
-            report('tool could not be repaired', true) -- остановить работу
-          end
-        else
-          turn() -- повернуться
-        end]]--
-      end
-      while robot.durability() < 0.3 do
-        print('нужен инструмент')
-        report('need a new tool')
-        sleep(30)
-      end
-    end
-  end
-  if enderchest and not forcibly then
-    robot.swing(3) -- забрать сундук
-  else
-    while energy_level() < 0.98 do -- ждать полного заряда батареи
-      report('заряжаюсь')
-      report('charging')
-      sleep(30)
-    end
-  end
-  ignore_check = nil
-  if not interrupt then
-    report('работаем')
-    report('return to work')
-    go(0, -2, 0)
-    go(x, y, z)
-    smart_turn(d)
-  end
+				if item then
+					now_charge = chest.getStackInInternalSlot(1).charge
+				else
+					sleep(30)
+				end
+			end
+			chest.equip()
+			--[[for side = 1, 3 do -- перебрать все стороны
+			  --local name = chest.getInventoryName(3) -- получить имя инвенторя
+			  size = chest.getInventorySize(3)
+			  if size == 2 then -- сравнить имя
+			    robot.select(1) -- выбрать слот
+			    chest.equip() -- достать инструмент
+			    if robot.drop(3) then -- если получилось засунуть инструмент в зарядник
+			      local charge = chest.getStackInSlot(3, 1).charge
+			      local max_charge = chest.getStackInSlot(3, 1).maxCharge
+			      while true do
+			        sleep(30)
+			        local n_charge = chest.getStackInSlot(3, 1).charge -- получить заряд
+			        if charge then
+			          if n_charge == max_charge then
+			            robot.suck(3) -- забрать предмет
+			            chest.equip() -- экипировать
+			            print('заряжено')
+			            break -- остановить зарядку
+			          else
+			            print('заряд '..math.floor((n_charge+1)/max_charge*100)..'% charged')
+			            report('tool is '..math.floor((n_charge+1)/max_charge*100)..'% charged')
+			          end
+			        else -- если инструмент не чинится
+			          print('не чинится')
+			          report('tool could not be charged', true) -- остановить работу
+			        end
+			      end
+			    else
+			      print('не чинится')
+			      report('tool could not be repaired', true) -- остановить работу
+			    end
+			  else
+			    turn() -- повернуться
+			  end]]--
+		end
+		while robot.durability() < 0.3 do
+			print('нужен инструмент')
+			report('need a new tool')
+			sleep(30)
+		end
+	end
+	if enderchest and not forcibly then
+		robot.swing(3) -- забрать сундук
+	else
+		while energy_level() < 0.98 do -- ждать полного заряда батареи
+	    	report('заряжаюсь')
+	    	report('charging')
+	    	sleep(30)
+		end
+	end
+	ignore_check = nil
+	if not interrupt then
+		report('работаем')
+		report('return to work')
+		go(0, -2, 0)
+		go(x, y, z)
+		smart_turn(d)
+	end
 end
 
 main = function()
