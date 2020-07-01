@@ -109,12 +109,14 @@ check = function(forcibly) -- проверка инструмента, бата�
       elseif solar and geolyzer.isSunVisible() and -- проверить видимость солнца
         (time.hour > 4 and time.hour < 17) then -- проверить время
         while not geolyzer.canSeeSky() do -- пока не видно неба
+          os.sleep(0)
           step(1, true) -- сделать шаг вверх без проверки
         end
         print('поиск солнца')
         report('recharging in the sun')
         sorter(true)
         while (energy_level() < 0.98) and geolyzer.isSunVisible() do
+          os.sleep(0)
           time = os.date('*t') -- время работы солнечной панели 05:30 - 18:30
           if time.hour >= 5 and time.hour < 19 then
             sleep(60)
@@ -152,7 +154,7 @@ step = function(side, ignore) -- функция движения на 1 блок
     print('неразрушаемый блок')
     report('insurmountable obstacle', true) -- послать сообщение
   else
-    while robot.swing(side) do end -- копать пока возможно
+    while robot.swing(side) do os.sleep(0) end -- копать пока возможно
   end
   if robot.move(side) then -- если робот сдвинулся, обновить координаты
     steps = steps + 1 -- debug
@@ -192,6 +194,7 @@ end
 
 smart_turn = function(side) -- поворот в определенную сторону света
   while D ~= side do
+  	os.sleep(0)
     turn((side-D)%4==1)
   end
 end
@@ -201,6 +204,7 @@ go = function(x, y, z) -- переход по указанным координ�
     y = border
   end
   while Y ~= y do
+  	os.sleep(0)
     if Y < y then
       step(1)
     elseif Y > y then
@@ -213,6 +217,7 @@ go = function(x, y, z) -- переход по указанным координ�
     smart_turn(1)
   end
   while X ~= x do
+  	os.sleep(0)
     step(3)
   end
   if Z < z then
@@ -221,6 +226,7 @@ go = function(x, y, z) -- переход по указанным координ�
     smart_turn(2)
   end
   while Z ~= z do
+  	os.sleep(0)
     step(3)
   end
 end
@@ -287,6 +293,7 @@ calibration = function() -- калибровка при запуске
   print('получить уровень износа/разряда инструмента')
   print('расчет расхода энергии за блок')
   while energy == robot.durability() do -- пока не обнаружена разница
+  	os.sleep(0)
     robot.place(3) -- установить блок
     robot.swing(3) -- разрушить блок
   end
@@ -330,7 +337,7 @@ inv_check = function() -- инвентаризация
     end
   end
   if inventory-items < 10 or items/inventory > 0.9 then
-    while robot.suck(1) do end
+    while robot.suck(1) do os.sleep(0) end
     home(true)
   end
 end
@@ -440,7 +447,7 @@ sorter = function(pack) -- сортировка лута
       end
     end
   end]]--
-  while robot.suck(1) do end --- забрать предметы из буфера
+  while robot.suck(1) do os.sleep(0) end --- забрать предметы из буфера
   inv_check()
 end
 
@@ -493,6 +500,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		if item then -- если слот не пуст
 			if not wlist[item.name] then -- если предмет не в белом списке
 				while item do
+				os.sleep(0)
 			  	robot.select(slot) -- выбрать слот
 			  	sleep(30)
 			  	item = chest.getStackInInternalSlot(slot)
@@ -568,6 +576,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			local now_charge = item.charge
 			local max_charge = item.maxCharge
 			while not(now_charge == max_charge) do
+				os.sleep(0)
 				print('ожидаю зарядки инструмента')
 				sleep(30)
 				item = chest.getStackInInternalSlot(1)
@@ -614,6 +623,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			  end]]--
 		end
 		while robot.durability() < 0.99 do
+			os.sleep(0)
 			print('инструмент не заряжается')
 			report('need a new tool')
 			sleep(30)
@@ -623,6 +633,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		robot.swing(3) -- забрать сундук
 	else
 		while energy_level() < 0.98 do -- ждать полного заряда батареи
+			os.sleep(0)
 	    	report('заряжаюсь')
 	    	report('charging')
 	    	sleep(30)
@@ -641,6 +652,7 @@ end
 main = function()
   border = nil
   while not border do
+  	os.sleep(0)
     step(0)
     for q = 1, 4 do
       scan(table.unpack(quads[q]))
@@ -648,6 +660,7 @@ main = function()
     check(true)
   end
   while #WORLD.x ~= 0 do
+  	os.sleep(0)
     local n_delta, c_delta, current = math.huge, math.huge
     for index = 1, #WORLD.x do
       n_delta = math.abs(X-WORLD.x[index])+math.abs(Y-WORLD.y[index])+math.abs(Z-WORLD.z[index])-border+WORLD.y[index]
