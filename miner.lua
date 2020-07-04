@@ -583,6 +583,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 				if item then
 					now_charge = item.charge
 				else
+					chest.equip()
 					sleep(30)
 				end
 			end
