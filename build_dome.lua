@@ -1,8 +1,8 @@
 local robot = require('robot')
 local height = 1
-local width = 5
+local width = 5 -- plus 1
 local turns = 2
-local length = 5
+local length = 5 -- plus 1
 local circles = math.ceil(width/2)-1
 local inventory_size = robot.inventorySize()
 
