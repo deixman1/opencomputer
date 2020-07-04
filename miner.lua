@@ -273,10 +273,10 @@ calibration = function() -- калибровка при запуске
   end
   if modem then -- если есть модем
     --modem.open(port)
-    modem.setWakeMessage('') -- установить сообщение пробуждения
-    modem.setStrength(400) -- установить силу сигнала
+    --modem.setWakeMessage('') -- установить сообщение пробуждения
+    --modem.setStrength(400) -- установить силу сигнала
   elseif tunnel then -- если есть туннель
-    tunnel.setWakeMessage('') -- установить сообщение пробуждения
+    --tunnel.setWakeMessage('') -- установить сообщение пробуждения
   end
   for slot = 1, inventory do -- пройти по слотам инвентаря
     if robot.count(slot) == 0 then -- если слот пуст
