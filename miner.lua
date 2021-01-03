@@ -336,8 +336,6 @@ inv_check = function() -- инвентаризация
       items = items + 1
     end
   end
-  print(inventory-items)
-  print(items)
   if inventory-items < 10 or items/inventory > 0.9 then
     while robot.suck(1) do os.sleep(0) end
     home(true)
