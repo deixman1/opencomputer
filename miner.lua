@@ -53,7 +53,7 @@ sleep = function(timeout)
   until computer.uptime() >= deadline
 end
 
-report = function(message, stop) -- рапорт о состоянии
+--[[report = function(message, stop) -- рапорт о состоянии
   message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
   if modem then -- если есть модем
     --modem.broadcast(port, message) -- послать сообщение через модем
@@ -69,6 +69,19 @@ report = function(message, stop) -- рапорт о состоянии
     print(message)
     os.exit()
   end
+end--]]
+
+status = function(message, stop) -- рапорт о состоянии
+  message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
+  print(message)
+  computer.beep() -- пикнуть
+  if stop then -- если есть флаг завершения
+    if chunkloader then
+      chunkloader.setActive(false)
+    end
+    error(message, 0) -- остановить работу программы
+    os.exit()
+  end
 end
 
 remove_point = function(point) -- удаление меток
@@ -82,22 +95,22 @@ check = function(forcibly) -- проверка инструмента, бата�
     inv_check()
     local delta = math.abs(X)+math.abs(Y)+math.abs(Z)+64 -- определить расстояние
     if robot.durability()/W_R < delta then -- если инструмент изношен
-      print('инструмент изношен')
-      report('tool is worn')
+      status('инструмент изношен')
+      --report('tool is worn')
       ignore_check = true
       home(true, false) -- отправиться домой
     end
     if delta*E_C > computer.energy() then -- проверка уровня энергии
-      print('низкий заряд')
-      report('battery is low')
+      status('низкий заряд')
+      --report('battery is low')
       ignore_check = true
       home(true, false) -- отправиться домой
     end
     if energy_level() < 0.3 then -- если энергии меньше 30%
       local time = os.date('*t')
       if generator and generator.count() == 0 and not forcibly then -- если есть генератор
-      	print('зарядка от генераторов')
-        report('refueling solid fuel generators')
+      	status('зарядка от генераторов')
+        --report('refueling solid fuel generators')
         for slot = 1, inventory do -- обойти инвентарь
           robot.select(slot) -- выбрать слот
           for gen in component.list('generator') do -- перебрать все генераторы
@@ -112,8 +125,8 @@ check = function(forcibly) -- проверка инструмента, бата�
           os.sleep(0)
           step(1, true) -- сделать шаг вверх без проверки
         end
-        print('поиск солнца')
-        report('recharging in the sun')
+        status('поиск солнца')
+        --report('recharging in the sun')
         sorter(true)
         while (energy_level() < 0.98) and geolyzer.isSunVisible() do
           os.sleep(0)
@@ -124,8 +137,8 @@ check = function(forcibly) -- проверка инструмента, бата�
             break
           end
         end
-        print('работаем')
-        report('return to work')
+        status('возврат к работе')
+        --report('return to work')
       end
     end
   end
@@ -151,8 +164,8 @@ step = function(side, ignore) -- функция движения на 1 блок
   local result, obstacle = robot.swing(side) 
   if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
     home(true) -- запустить завершающую функцию
-    print('неразрушаемый блок')
-    report('insurmountable obstacle', true) -- послать сообщение
+    status('неразрушаемый блок')
+    --report('insurmountable obstacle', true) -- послать сообщение
   else
     while robot.swing(side) do os.sleep(0) end -- копать пока возможно
   end
@@ -250,16 +263,17 @@ end
 calibration = function() -- калибровка при запуске
   local stat_tool = robot.durability() <= 0.1
   if not chest then -- проверить наличие контроллера инвентаря
-  	print('контроллер инвентаря не найден')
-    report('inventory controller not detected', true)
+  	status('контроллер инвентаря не найден')
+    --report('inventory controller not detected', true)
   elseif not geolyzer then -- проверить наличие геосканера
-  	print('геоанализатор не найден')
-    report('geolyzer not detected', true)
+  	status('геоанализатор не найден')
+    --report('geolyzer not detected', true)
   elseif not robot.detect(0) then
-  	print('снизу нет блока')
-    report('bottom solid block is not detected', true)
+  	status('снизу нет блока')
+    --report('bottom solid block is not detected', true)
   elseif stat_tool then
-    report('нет инструмента или почти изношен', true)
+  	status('нет инструмента или почти изношен')
+    --report('нет инструмента или почти изношен', true)
   end
   local clist = computer.getDeviceInfo()
   for i, j in pairs(clist) do
@@ -286,24 +300,24 @@ calibration = function() -- калибровка при запуске
   end
   local energy = computer.energy() -- получить уровень энергии
   step(0) -- сделать шаг
-  print('шаг')
+  status('шаг')
   E_C = math.ceil(energy-computer.energy()) -- записать уровень потребления
-  print('записать уровень потребления')
+  status('записать уровень потребления')
   energy = robot.durability() -- получить уровень износа/разряда инструмента
-  print('получить уровень износа/разряда инструмента')
-  print('расчет расхода энергии за блок')
+  status('получить уровень износа/разряда инструмента')
+  status('расчет расхода энергии за блок')
   while energy == robot.durability() do -- пока не обнаружена разница
   	os.sleep(0)
     robot.place(3) -- установить блок
     robot.swing(3) -- разрушить блок
   end
-  print('записать результат')
+  status('записать результат')
   W_R = energy-robot.durability() -- записать результат
-  print('линки сторон света, для сырых данных')
+  status('линки сторон света, для сырых данных')
   local sides = {2, 1, 3, 0} -- линки сторон света, для сырых данных
-  print('обнуление направления')
+  status('обнуление направления')
   D = nil -- обнуление направления
-  print('проверка всех направлений')
+  status('проверка всех направлений')
   for s = 1, #sides do -- проверка всех направлений
     if robot.detect(3) or robot.place(3) then -- проверить наличие блока перед носом
       local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
@@ -316,13 +330,13 @@ calibration = function() -- калибровка при запуске
         end
       end
     else
-      print('поворот')
+      status('поворот')
       turn() -- задействовать простой поворот
     end
   end
   if not D then
-  	print('калибровка не удалась')
-    report('calibration error', true)
+  	status('калибровка не удалась', true)
+    --report('calibration error', true)
   end
 end
 
@@ -446,15 +460,15 @@ sorter = function(pack) -- сортировка лута
         end
       end
     end
-  end]]--
+  end--]]
   while robot.suck(1) do os.sleep(0) end --- забрать предметы из буфера
   inv_check()
 end
 
 home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
 	local x, y, z, d
-	print('выгрузка руды')
-	report('ore unloading')
+	status('выгрузка руды')
+	--report('ore unloading')
 	ignore_check = true
 	--[[local enderchest -- обнулить слот с эндерсундуком
 	for slot = 1, inventory do -- просканировать инвентарь
@@ -471,7 +485,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		robot.swing(3) -- освободить место для сундука
 		robot.select(enderchest) -- выбрать сундук
 		robot.place(3) -- поставить сундук
-	else]]--
+	else--]]
 		x, y, z, d = X, Y, Z, D
 		go(0, -2, 0)
 		go(0, 0, 0)
@@ -493,8 +507,8 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		else
 			break -- продолжить работу
 		end
-	end]]--
-	print('ожидание выгрузки')
+	end--]]
+	status('ожидание выгрузки')
 	for slot = 1, inventory do -- обойти весь инвентарь
 		local item = chest.getStackInInternalSlot(slot)
 		if item then -- если слот не пуст
@@ -511,11 +525,11 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 				    report(b) -- послать сообщение
 				    sleep(30) -- подождать
 				  end
-				end]]--
+				end--]]
 			end
 		end
 	end
-	print('выгружено')
+	status('выгружено')
 	--[[if crafting then -- если есть верстак, забрать предметы из сундука и упаковать
 	  for slot = 1, size do -- обход слотов контейнера
 	    local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
@@ -535,7 +549,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 	      end
 	    end
 	  end
-	end]]--
+	end--]]
 	if generator and not forcibly then -- если есть генератор
 		for slot = 1, size do -- просканировать контейнер
 			local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
@@ -565,11 +579,11 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		    end
 		  end
 		  chest.equip() -- экипировать
-		end]]--
+		end--]]
 		if robot.durability() < 0.99 then -- если инструмент не заменился на лучший
-			print('пробуем зарядить')
-			report('attempt to repair tool')
-			print('ебаный сервер, ждем зарядки инструмента')
+			status('пробуем зарядить')
+			--report('attempt to repair tool')
+			status('ебаный сервер, ждем зарядки инструмента')
 			robot.select(1)
 			chest.equip()
 			local item = chest.getStackInInternalSlot(1)
@@ -577,7 +591,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			local max_charge = item.maxCharge
 			while not(now_charge == max_charge) do
 				os.sleep(0)
-				print('ожидаю зарядки инструмента')
+				status('ожидаю зарядки инструмента')
 				sleep(30)
 				item = chest.getStackInInternalSlot(1)
 				if item then
@@ -621,12 +635,12 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			    end
 			  else
 			    turn() -- повернуться
-			  end]]--
+			  end--]]
 		end
 		while robot.durability() < 0.99 do
 			os.sleep(0)
-			print('инструмент не заряжается')
-			report('need a new tool')
+			status('инструмент не заряжается')
+			--report('need a new tool')
 			sleep(30)
 		end
 	end
@@ -635,15 +649,15 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 	else
 		while energy_level() < 0.98 do -- ждать полного заряда батареи
 			os.sleep(0)
-	    	report('заряжаюсь')
-	    	report('charging')
+	    	status('заряжаюсь')
+	    	--report('charging')
 	    	sleep(30)
 		end
 	end
 	ignore_check = nil
 	if not interrupt then
-		report('работаем')
-		report('return to work')
+		status('возврат к работе')
+		--report('return to work')
 		go(0, -2, 0)
 		go(x, y, z)
 		smart_turn(d)
@@ -698,13 +712,13 @@ for o = 1, 10 do -- цикл ограничения спирали
   for i = 1, 2 do -- цикл обновления координат
     for a = 1, o do -- цикл перехода по линии спирали
       main() -- запуск функции сканирования и добычи
-      print('в чанке #'..pos[3]+1 ..' работа заершена')
-      report('chunk #'..pos[3]+1 ..' processed') -- сообщить о завершении работы в чанке
+      status('в чанке #'..pos[3]+1 ..' работа заершена')
+      --report('chunk #'..pos[3]+1 ..' processed') -- сообщить о завершении работы в чанке
       pos[i], pos[3] = pos[i] + pos[0], pos[3] + 1 -- обновить координаты
       if pos[3] == chunks then -- если достигнут последний чанк
         home(true, true) -- возврат домой
-        print(computer.uptime()-Tau..' секунд\nдлина пути: '..steps..'\nсделано поворотов: '..turns, true) 
-        report(computer.uptime()-Tau..' seconds\npath length: '..steps..'\nmade turns: '..turns, true) -- сообщить о завершении работы
+        status(computer.uptime()-Tau..' секунд\nдлина пути: '..steps..'\nсделано поворотов: '..turns, true) 
+        --report(computer.uptime()-Tau..' seconds\npath length: '..steps..'\nmade turns: '..turns, true) -- сообщить о завершении работы
       else -- иначе
         WORLD = {x = {}, y = {}, z = {}} 
         go(pos[1]*16, -2, pos[2]*16) -- перейти к следующему чанку
