@@ -653,7 +653,7 @@ end
 main = function()
   border = nil
   while not border do
-  	os.sleep(0)
+    os.sleep(0)
     step(0)
     for q = 1, 4 do
       scan(table.unpack(quads[q]))
@@ -661,7 +661,7 @@ main = function()
     check(true)
   end
   while #WORLD.x ~= 0 do
-  	os.sleep(0)
+    os.sleep(0)
     local n_delta, c_delta, current = math.huge, math.huge
     for index = 1, #WORLD.x do
       n_delta = math.abs(X-WORLD.x[index])+math.abs(Y-WORLD.y[index])+math.abs(Z-WORLD.z[index])-border+WORLD.y[index]
