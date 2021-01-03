@@ -654,16 +654,16 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			sleep(30)
 		end
 	end
-	if enderchest and not forcibly then
+	--[[if enderchest and not forcibly then
 		robot.swing(3) -- забрать сундук
-	else
-		while energy_level() < 0.98 do -- ждать полного заряда батареи
-			os.sleep(0)
-	    	status('заряжаюсь')
-	    	--report('charging')
-	    	sleep(30)
-		end
+	else--]]
+	while energy_level() < 0.98 do -- ждать полного заряда батареи
+		os.sleep(0)
+	   	status('заряжаюсь')
+	   	--report('charging')
+	   	sleep(30)
 	end
+	--end
 	ignore_check = nil
 	if not interrupt then
 		status('возврат к работе')
