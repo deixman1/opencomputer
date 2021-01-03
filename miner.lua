@@ -336,6 +336,8 @@ inv_check = function() -- инвентаризация
       items = items + 1
     end
   end
+  print(inventory-items)
+  print(items)
   if inventory-items < 10 or items/inventory > 0.9 then
     while robot.suck(1) do os.sleep(0) end
     home(true)
@@ -456,7 +458,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 	print('выгрузка руды')
 	report('ore unloading')
 	ignore_check = true
-	local enderchest -- обнулить слот с эндерсундуком
+	--[[local enderchest -- обнулить слот с эндерсундуком
 	for slot = 1, inventory do -- просканировать инвентарь
 		local item = chest.getStackInInternalSlot(slot) -- получить информацию о слоте
 		if item then -- если есть предмет
@@ -471,11 +473,11 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		robot.swing(3) -- освободить место для сундука
 		robot.select(enderchest) -- выбрать сундук
 		robot.place(3) -- поставить сундук
-	else
+	else]]--
 		x, y, z, d = X, Y, Z, D
 		go(0, -2, 0)
 		go(0, 0, 0)
-	end
+	--end
 	sorter() -- сортировка инвентаря
 	local size = nil -- обнулить размер контейнера
 	--[[while true do -- войти в бесконечный цикл
