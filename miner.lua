@@ -466,6 +466,7 @@ sorter = function(pack) -- сортировка лута
 end
 
 tool_charging = function()
+	chest.equip()
 	local item = chest.getStackInInternalSlot(1)
 	local now_charge = 0
 	local max_charge = 1
@@ -604,9 +605,8 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			--report('attempt to repair tool')
 			status('ебаный сервер, ждем зарядки инструмента')
 			robot.select(1)
-			chest.equip()
 			tool_charging()
-			chest.equip()
+			--chest.equip()
 			--[[for side = 1, 3 do -- перебрать все стороны
 			  --local name = chest.getInventoryName(3) -- получить имя инвенторя
 			  size = chest.getInventorySize(3)
@@ -642,10 +642,15 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			    turn() -- повернуться
 			  end--]]
 		end
-		while robot.durability() < 0.99 do
-			os.sleep(0)
-			status('инструмент не заряжается')
-			--report('need a new tool')
+		local tool = robot.durability()
+		if tool then
+			while robot.durability() < 0.99 do
+				os.sleep(0)
+				status('инструмент не заряжен')
+				--report('need a new tool')
+			end
+		else
+			status('нет инструмента')
 			sleep(30)
 		end
 	end
