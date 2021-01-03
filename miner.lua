@@ -467,13 +467,12 @@ end
 
 tool_charging = function()
 	local item = chest.getStackInInternalSlot(1)
-	--if item then
 	local now_charge = 0
 	local max_charge = 1
 	while not(now_charge == max_charge) do
 		os.sleep(0)
 		status('ожидаю зарядки инструмента')
-		sleep(1)
+		sleep(30)
 		item = chest.getStackInInternalSlot(1)
 		if item then
 			now_charge = item.charge
@@ -483,10 +482,6 @@ tool_charging = function()
 		end
 	end
 	chest.equip()
-	--[[else
-		status('ожидаю зарядки инструмента')
-		sleep(1)
-	end--]]
 end
 
 home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
