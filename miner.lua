@@ -73,13 +73,14 @@ end--]]
 
 status = function(message, stop) -- рапорт о состоянии
   message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
+  clear
   print(message)
   computer.beep() -- пикнуть
   if stop then -- если есть флаг завершения
     if chunkloader then
       chunkloader.setActive(false)
     end
-    ----error(message, 0) -- остановить работу программы
+    --error(message, 0) -- остановить работу программы
     os.exit()
   end
 end
@@ -606,6 +607,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			status('ебаный сервер, ждем зарядки инструмента')
 			robot.select(1)
 			tool_charging()
+			status('возврат к работе')
 			--chest.equip()
 			--[[for side = 1, 3 do -- перебрать все стороны
 			  --local name = chest.getInventoryName(3) -- получить имя инвенторя
