@@ -79,7 +79,7 @@ status = function(message, stop) -- рапорт о состоянии
     if chunkloader then
       chunkloader.setActive(false)
     end
-    --error(message, 0) -- остановить работу программы
+    ----error(message, 0) -- остановить работу программы
     os.exit()
   end
 end
