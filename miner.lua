@@ -73,7 +73,7 @@ end
 	end
 end--]]
 
-status = function(message, stop) -- рапорт о состоянии
+local status = function(message, stop) -- рапорт о состоянии
 	message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
 	os.execute("clear")
 	local file = io.open("logs.txt", "a")
@@ -167,7 +167,7 @@ end
 step = function(side, ignore) -- функция движения на 1 блок
 	local result, obstacle = robot.swing(side) 
 	if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
-		home(true) -- запустить завершающую функцию
+		home(true, false) -- запустить завершающую функцию
 		status('неразрушаемый блок')
 		--report('insurmountable obstacle', true) -- послать сообщение
 	else
@@ -351,7 +351,7 @@ inv_check = function() -- инвентаризация
 	end
 	if inventory-items < 10 or items/inventory > 0.9 then
 		robot.suck(1)
-		home(true)
+		home(true, false)
 	end
 end
 
@@ -484,7 +484,6 @@ end
 home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
 	local x, y, z, d
 	status('выгрузка руды')
-	ignore_check = true
 	--report('ore unloading')
 	--[[local enderchest -- обнулить слот с эндерсундуком
 	for slot = 1, inventory do -- просканировать инвентарь
@@ -502,9 +501,14 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		robot.select(enderchest) -- выбрать сундук
 		robot.place(3) -- поставить сундук
 	else--]]
-		x, y, z, d = X, Y, Z, D
-		go(0, -2, 0)
-		go(0, 0, 0)
+	status('координаты')
+	x = X
+	y = Y
+	z = Z
+	d = D
+	go(0, -2, 0)
+	go(0, 0, 0)
+	status('координаты')
 	--end
 	sorter() -- сортировка инвентаря
 	local size = nil -- обнулить размер контейнера
@@ -659,7 +663,6 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		sleep(30)
 	end
 	--end
-	ignore_check = false
 	if not interrupt then
 		status('возврат к работе')
 		--report('return to work')
@@ -667,6 +670,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		go(x, y, z)
 		smart_turn(d)
 	end
+	ignore_check = false
 end
 
 main = function()
