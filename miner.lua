@@ -484,6 +484,7 @@ end
 home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
 	local x, y, z, d
 	status('выгрузка руды')
+	ignore_check = true
 	--report('ore unloading')
 	--[[local enderchest -- обнулить слот с эндерсундуком
 	for slot = 1, inventory do -- просканировать инвентарь
@@ -658,6 +659,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		sleep(30)
 	end
 	--end
+	ignore_check = false
 	if not interrupt then
 		status('возврат к работе')
 		--report('return to work')
@@ -665,7 +667,6 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		go(x, y, z)
 		smart_turn(d)
 	end
-	ignore_check = false
 end
 
 main = function()
