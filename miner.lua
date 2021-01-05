@@ -167,11 +167,11 @@ end
 step = function(side, ignore) -- функция движения на 1 блок
 	local result, obstacle = robot.swing(side) 
 	if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
-		home(true, false) -- запустить завершающую функцию
 		status('неразрушаемый блок')
+		home(true, false) -- запустить завершающую функцию
 		--report('insurmountable obstacle', true) -- послать сообщение
 	else
-		robot.swing(side) -- копать пока возможно
+		while robot.swing(side) do os.sleep(0) end -- копать пока возможно
 	end
 	if robot.move(side) then -- если робот сдвинулся, обновить координаты
 		steps = steps + 1 -- debug
@@ -351,6 +351,7 @@ inv_check = function() -- инвентаризация
 	end
 	if inventory-items < 10 or items/inventory > 0.9 then
 		robot.suck(1)
+		status('инвентарь заполнен')
 		home(true, false)
 	end
 end
@@ -464,7 +465,8 @@ sorter = function(pack) -- сортировка лута
 	inv_check()
 end
 
-tool_charging = function()
+local tool_charging = function()
+	robot.select(1)
 	chest.equip()
 	local item = chest.getStackInInternalSlot(1)
 	local now_charge = 0
@@ -482,7 +484,6 @@ tool_charging = function()
 end
 
 home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
-	local x, y, z, d
 	status('выгрузка руды')
 	--report('ore unloading')
 	--[[local enderchest -- обнулить слот с эндерсундуком
@@ -501,16 +502,18 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		robot.select(enderchest) -- выбрать сундук
 		robot.place(3) -- поставить сундук
 	else--]]
-	x = X
-	y = Y
-	z = Z
-	d = D
+	local x = X
+	local y = Y
+	local z = Z
+	local d = D
+	status('отправляюсь домой')
 	go(0, -2, 0)
 	go(0, 0, 0)
+	status('прибыл')
 	--end
 	sorter() -- сортировка инвентаря
-	local size = nil -- обнулить размер контейнера
-	--[[while true do -- войти в бесконечный цикл
+	--[[local size = nil -- обнулить размер контейнера
+	while true do -- войти в бесконечный цикл
 		for side = 1, 4 do -- поиск контейнера
 			size = chest.getInventorySize(3) -- получение размера инвентаря
 			if size and size>26 then -- если контейнер найден
@@ -597,15 +600,15 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			end
 			chest.equip() -- экипировать
 		end--]]
-		if robot.durability() < 0.99 then -- если инструмент не заменился на лучший
+		--[[if robot.durability() < 0.98 then -- если инструмент не заменился на лучший
 			status('пробуем зарядить')
 			--report('attempt to repair tool')
 			status('ебаный сервер, ждем зарядки инструмента')
-			robot.select(1)
 			tool_charging()
-			status('возврат к работе')
+			status('заряжен')
+			--status('возврат к работе')
 			--chest.equip()
-			--[[for side = 1, 3 do -- перебрать все стороны
+			for side = 1, 3 do -- перебрать все стороны
 				--local name = chest.getInventoryName(3) -- получить имя инвенторя
 				size = chest.getInventorySize(3)
 				if size == 2 then -- сравнить имя
@@ -638,18 +641,13 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 					end
 				else
 					turn() -- повернуться
-				end--]]
-		end
-		local tool = robot.durability()
-		if tool then
-			while robot.durability() < 0.99 do
-				sleep(30)
-				status('инструмент не заряжен')
-				--report('need a new tool')
-			end
-		else
-			status('нет инструмента')
-			sleep(30)
+				end
+		end--]]
+		if robot.durability() < 0.98 then
+			status('пробуем зарядить инструмент')
+			robot.select(1)
+			tool_charging()
+			status('инструмент заряжен')
 		end
 	end
 	--[[if enderchest and not forcibly then
@@ -667,6 +665,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		go(0, -2, 0)
 		go(x, y, z)
 		smart_turn(d)
+		status('прибыл')
 	end
 	ignore_check = false
 end
