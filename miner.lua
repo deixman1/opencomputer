@@ -660,6 +660,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 	end
 	--end
 	if not interrupt then
+		status('|x='..x..' y='..y..' z='..z..'|')
 		status('возврат к работе')
 		--report('return to work')
 		go(0, -2, 0)
