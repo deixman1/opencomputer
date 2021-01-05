@@ -42,6 +42,8 @@ local robot = add_component('robot')
 local inventory = robot.inventorySize()
 local energy_level, sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main, solar, ignore_check, inv_check
 
+ignore_check = false
+
 energy_level = function()
 	return computer.energy()/computer.maxEnergy()
 end
@@ -126,14 +128,12 @@ check = function(forcibly) -- проверка инструмента, бата�
 			elseif solar and geolyzer.isSunVisible() and -- проверить видимость солнца
 				(time.hour > 4 and time.hour < 17) then -- проверить время
 				while not geolyzer.canSeeSky() do -- пока не видно неба
-					os.sleep(0)
 					step(1, true) -- сделать шаг вверх без проверки
 				end
 				status('поиск солнца')
 				--report('recharging in the sun')
 				sorter(true)
 				while (energy_level() < 0.98) and geolyzer.isSunVisible() do
-					os.sleep(0)
 					time = os.date('*t') -- время работы солнечной панели 05:30 - 18:30
 					if time.hour >= 5 and time.hour < 19 then
 						sleep(60)
@@ -171,7 +171,7 @@ step = function(side, ignore) -- функция движения на 1 блок
 		status('неразрушаемый блок')
 		--report('insurmountable obstacle', true) -- послать сообщение
 	else
-		while robot.swing(side) do os.sleep(0) end -- копать пока возможно
+		robot.swing(side) -- копать пока возможно
 	end
 	if robot.move(side) then -- если робот сдвинулся, обновить координаты
 		steps = steps + 1 -- debug
@@ -211,7 +211,6 @@ end
 
 smart_turn = function(side) -- поворот в определенную сторону света
 	while D ~= side do
-		os.sleep(0)
 		turn((side-D)%4==1)
 	end
 end
@@ -221,7 +220,6 @@ go = function(x, y, z) -- переход по указанным координ�
 		y = border
 	end
 	while Y ~= y do
-		os.sleep(0)
 		if Y < y then
 			step(1)
 		elseif Y > y then
@@ -234,7 +232,6 @@ go = function(x, y, z) -- переход по указанным координ�
 		smart_turn(1)
 	end
 	while X ~= x do
-		os.sleep(0)
 		step(3)
 	end
 	if Z < z then
@@ -243,7 +240,6 @@ go = function(x, y, z) -- переход по указанным координ�
 		smart_turn(2)
 	end
 	while Z ~= z do
-		os.sleep(0)
 		step(3)
 	end
 end
@@ -265,7 +261,7 @@ scan = function(xx, zz) -- сканирование квадрата x8 отно
 end
 
 calibration = function() -- калибровка при запуске
-	local stat_tool = robot.durability() <= 0.1
+	local stat_tool = robot.durability() <= 0.8
 	if not chest then -- проверить наличие контроллера инвентаря
 		status('контроллер инвентаря не найден')
 		--report('inventory controller not detected', true)
@@ -311,7 +307,6 @@ calibration = function() -- калибровка при запуске
 	status('получить уровень износа/разряда инструмента')
 	status('расчет расхода энергии за блок')
 	while energy == robot.durability() do -- пока не обнаружена разница
-		os.sleep(0)
 		robot.place(3) -- установить блок
 		robot.swing(3) -- разрушить блок
 	end
@@ -355,7 +350,7 @@ inv_check = function() -- инвентаризация
 		end
 	end
 	if inventory-items < 10 or items/inventory > 0.9 then
-		while robot.suck(1) do os.sleep(0) end
+		robot.suck(1)
 		home(true)
 	end
 end
@@ -465,7 +460,7 @@ sorter = function(pack) -- сортировка лута
 			end
 		end
 	end--]]
-	while robot.suck(1) do os.sleep(0) end --- забрать предметы из буфера
+	robot.suck(1) --- забрать предметы из буфера
 	inv_check()
 end
 
@@ -475,7 +470,6 @@ tool_charging = function()
 	local now_charge = 0
 	local max_charge = 1
 	while not(now_charge == max_charge) do
-		os.sleep(0)
 		status('ожидаю зарядки инструмента')
 		sleep(30)
 		item = chest.getStackInInternalSlot(1)
@@ -493,7 +487,6 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 	local x, y, z, d
 	status('выгрузка руды')
 	--report('ore unloading')
-	ignore_check = true
 	--[[local enderchest -- обнулить слот с эндерсундуком
 	for slot = 1, inventory do -- просканировать инвентарь
 		local item = chest.getStackInInternalSlot(slot) -- получить информацию о слоте
@@ -538,7 +531,6 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		if item then -- если слот не пуст
 			if not wlist[item.name] then -- если предмет не в белом списке
 				while item do
-				os.sleep(0)
 					robot.select(slot) -- выбрать слот
 					sleep(30)
 					item = chest.getStackInInternalSlot(slot)
@@ -650,7 +642,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		local tool = robot.durability()
 		if tool then
 			while robot.durability() < 0.99 do
-				os.sleep(0)
+				sleep(30)
 				status('инструмент не заряжен')
 				--report('need a new tool')
 			end
@@ -663,13 +655,12 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		robot.swing(3) -- забрать сундук
 	else--]]
 	while energy_level() < 0.98 do -- ждать полного заряда батареи
-		os.sleep(0)
-		 	status('заряжаюсь')
-		 	--report('charging')
-		 	sleep(30)
+		status('заряжаюсь')
+		--report('charging')
+		sleep(30)
 	end
 	--end
-	ignore_check = nil
+	ignore_check = false
 	if not interrupt then
 		status('возврат к работе')
 		--report('return to work')
@@ -682,7 +673,6 @@ end
 main = function()
 	border = nil
 	while not border do
-		os.sleep(0)
 		step(0)
 		for q = 1, 4 do
 			scan(table.unpack(quads[q]))
