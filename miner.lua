@@ -112,7 +112,7 @@ check = function(forcibly) -- проверка инструмента, бата�
 			ignore_check = true
 			home(true, false) -- отправиться домой
 		end
-		if energy_level() < 0.3 then -- если энергии меньше 30%
+		--[[if energy_level() < 0.3 then -- если энергии меньше 30%
 			local time = os.date('*t')
 			if generator and generator.count() == 0 and not forcibly then -- если есть генератор
 				status('зарядка от генераторов')
@@ -144,7 +144,7 @@ check = function(forcibly) -- проверка инструмента, бата�
 				status('возврат к работе')
 				--report('return to work')
 			end
-		end
+		end--]]
 	end
 	if #WORLD.x ~= 0 then -- если таблица меток не пуста
 		for i = 1, #WORLD.x do -- пройти по всем позициям
@@ -476,8 +476,6 @@ tool_charging = function()
 		if item then
 			now_charge = item.charge
 			max_charge = item.maxCharge
-		else
-			chest.equip()
 		end
 	end
 	chest.equip()
@@ -566,7 +564,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 			end
 		end
 	end--]]
-	if generator and not forcibly then -- если есть генератор
+	--[[if generator and not forcibly then -- если есть генератор
 		for slot = 1, size do -- просканировать контейнер
 			local item = chest.getStackInSlot(3, slot) -- получить информацию о пердмете
 			if item then -- если есть предмет
@@ -576,7 +574,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 					end
 			end
 		end
-	end
+	end--]]
 	if forcibly then
 		--[[print('ищем в контейнере')
 		report('tool search in container')
@@ -660,7 +658,6 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		sleep(30)
 	end
 	--end
-	ignore_check = false
 	if not interrupt then
 		status('возврат к работе')
 		--report('return to work')
@@ -668,6 +665,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
 		go(x, y, z)
 		smart_turn(d)
 	end
+	ignore_check = false
 end
 
 main = function()
