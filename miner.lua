@@ -74,6 +74,9 @@ end--]]
 status = function(message, stop) -- рапорт о состоянии
 	message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
 	os.execute("clear")
+	local file = io.open("logs.txt", "a")
+	file:write(message)
+	file:close()
 	print(message)
 	computer.beep() -- пикнуть
 	if stop then -- если есть флаг завершения
