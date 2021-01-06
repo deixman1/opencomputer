@@ -1,20 +1,18 @@
--- Made by Totoro (25.06.2014)
-
 local robot = require("robot")
 local fs = require("filesystem")
 local shell = require("shell") 
 local args = {...}
 
 if #args ~= 1 then
-  print("Usage: build <filename>")
-  return
+    print("Usage: build <filename>")
+    return
 end
  
 local filename = shell.resolve(args[1])
  
 if not fs.exists(filename) then
-  print("File \""..filename.."\" does not exist!")
-  --return
+    print("File \""..filename.."\" does not exist!")
+    --return
 end
  
 local length = 0
@@ -175,225 +173,225 @@ wool[14] = "Red"
 wool[15] = "Black"
  
 function getBlockName(id, blockData)
-  blockData = blockData or nil
-  if(block_id[id] == nil) then
-    return "UNKNOWN_"..id.."/"..blockData
-  else
-    if(blockData) then
-      if(id == 35) then
-        str = wool[blockData] .. " " .. block_id[id]
-        return str
-      end
+    blockData = blockData or nil
+    if(block_id[id] == nil) then
+        return "UNKNOWN_"..id.."/"..blockData
+    else
+        if(blockData) then
+            if(id == 35) then
+                str = wool[blockData] .. " " .. block_id[id]
+                return str
+            end
+        end
+        return block_id[id]
     end
-    return block_id[id]
-  end
 end
  
 function getBlockId(x,y,z)
-  return blocks[y + z*width + x*length*width + 1]
+    return blocks[y + z*width + x*length*width + 1]
 end
  
 function getData(x,y,z)
-  return data[y + z*width + x*length*width + 1]
+    return data[y + z*width + x*length*width + 1]
 end
  
 function readbytes(file, n)
-  for i=1,n do
-    string.byte(file:read(1))
-  end
+    for i=1,n do
+        string.byte(file:read(1))
+    end
 end
  
-function readname(file)  
-  n1 = string.byte(file:read(1))
-  n2 = string.byte(file:read(1))
+function readname(file)    
+    n1 = string.byte(file:read(1))
+    n2 = string.byte(file:read(1))
  
-  if(n1 == nil or n2 == nil) then
-    return ""
-  end
+    if(n1 == nil or n2 == nil) then
+        return ""
+    end
  
-  n = n1*256 + n2
+    n = n1*256 + n2
  
-  str = ""
-  for i=1,n do
-    c = file:read(1)
-    if c == nil then
-      return
-    end 
-    str = str .. c
-  end
-  --
-  --print("Name: "..str)
-  --io.read()
-  --
-  return str
+    str = ""
+    for i=1,n do
+        c = file:read(1)
+        if c == nil then
+            return
+        end 
+        str = str .. c
+    end
+    --
+    --print("Name: "..str)
+    --io.read()
+    --
+    return str
 end
  
 function parse(a, file, containsName)
-  if containsName == nil then containsName = true end
-  --print(a)
-  if a==0 then
-    return
-  end
-  if containsName then
-    name = readname(file)
-  end
-   
-  if a==1 then
-    readbytes(file,1)  
-  elseif a==2 then
-    i1 = string.byte(file:read(1))
-    i2 = string.byte(file:read(1))
-    i = i1*256 + i2
-    if(name=="Height") then
-      height = i
-    elseif (name=="Length") then
-      length = i
-    elseif (name=="Width") then
-      width = i
+    if containsName == nil then containsName = true end
+    --print(a)
+    if a==0 then
+        return
     end
-  elseif a==3 then
-    readbytes(file,4)
-  elseif a==4 then
-    readbytes(file,8)
-  elseif a==5 then
-    readbytes(file,4)
-  elseif a==6 then
-    readbytes(file,8)
-  elseif a==7 then
-    i1 = string.byte(file:read(1))
-    i2 = string.byte(file:read(1))
-    i3 = string.byte(file:read(1))
-    i4 = string.byte(file:read(1))
-    i = i1*256*256*256 + i2*256*256 + i3*256 + i4
-    if name == "Blocks" then
-      for i=1,i do
-        table.insert(blocks, string.byte(file:read(1)))
-      end
-    elseif name == "Data" then
-      for i=1,i do
-        table.insert(data, string.byte(file:read(1)))
-      end
-    else
-      readbytes(file,i)
+    if containsName then
+        name = readname(file)
     end
-  elseif a==8 then
-    i1 = string.byte(file:read(1))
-    i2 = string.byte(file:read(1))
-    i = i1*256 + i2
-    readbytes(file,i)
-  elseif a==9 then
-    t = string.byte(file:read(1))
-    i1 = string.byte(file:read(1))
-    i2 = string.byte(file:read(1))
-    i3 = string.byte(file:read(1))
-    i4 = string.byte(file:read(1))
-    i = i1*256*256*256 + i2*256*256 + i3*256 + i4
-    --print("Num: "..i)
-    for j=1,i do
-      --print("Step: "..j.." of "..i)
-      if t ~= 10 then
-        parse(t, file, false)
-      else
-        break
-        --parse(string.byte(file:read(1)), file)
-      end
+     
+    if a==1 then
+        readbytes(file,1)    
+    elseif a==2 then
+        i1 = string.byte(file:read(1))
+        i2 = string.byte(file:read(1))
+        i = i1*256 + i2
+        if(name=="Height") then
+            height = i
+        elseif (name=="Length") then
+            length = i
+        elseif (name=="Width") then
+            width = i
+        end
+    elseif a==3 then
+        readbytes(file,4)
+    elseif a==4 then
+        readbytes(file,8)
+    elseif a==5 then
+        readbytes(file,4)
+    elseif a==6 then
+        readbytes(file,8)
+    elseif a==7 then
+        i1 = string.byte(file:read(1))
+        i2 = string.byte(file:read(1))
+        i3 = string.byte(file:read(1))
+        i4 = string.byte(file:read(1))
+        i = i1*256*256*256 + i2*256*256 + i3*256 + i4
+        if name == "Blocks" then
+            for i=1,i do
+                table.insert(blocks, string.byte(file:read(1)))
+            end
+        elseif name == "Data" then
+            for i=1,i do
+                table.insert(data, string.byte(file:read(1)))
+            end
+        else
+            readbytes(file,i)
+        end
+    elseif a==8 then
+        i1 = string.byte(file:read(1))
+        i2 = string.byte(file:read(1))
+        i = i1*256 + i2
+        readbytes(file,i)
+    elseif a==9 then
+        t = string.byte(file:read(1))
+        i1 = string.byte(file:read(1))
+        i2 = string.byte(file:read(1))
+        i3 = string.byte(file:read(1))
+        i4 = string.byte(file:read(1))
+        i = i1*256*256*256 + i2*256*256 + i3*256 + i4
+        --print("Num: "..i)
+        for j=1,i do
+            --print("Step: "..j.." of "..i)
+            if t ~= 10 then
+                parse(t, file, false)
+            else
+                break
+                --parse(string.byte(file:read(1)), file)
+            end
+        end
     end
-  end
 end
 
 pos = {x=0, y=0, z=0}
 dir = 0
 
 function forward()
-  while not robot.forward() do
-    robot.swing()
-  end
-  
-  if dir == 0 then pos.x = pos.x+1
-  elseif dir == 2 then pos.x = pos.x-1
-  elseif dir == 1 then pos.z = pos.z-1
-  else pos.z = pos.z+1
-  end
+    while not robot.forward() do
+        robot.swing()
+    end
+    
+    if dir == 0 then pos.x = pos.x+1
+    elseif dir == 2 then pos.x = pos.x-1
+    elseif dir == 1 then pos.z = pos.z-1
+    else pos.z = pos.z+1
+    end
 end
 function up()
-  while not robot.up() do
-    robot.swingUp()
-  end
-  
-  pos.y = pos.y+1
+    while not robot.up() do
+        robot.swingUp()
+    end
+    
+    pos.y = pos.y+1
 end
 function down()
-  while not robot.down() do
-    robot.swingDown()
-  end
-  
-  pos.y = pos.y-1
+    while not robot.down() do
+        robot.swingDown()
+    end
+    
+    pos.y = pos.y-1
 end
 function turnLeft()
-    dir = dir-1
-    if dir<0 then dir=3 end
-    robot.turnLeft()
+        dir = dir-1
+        if dir<0 then dir=3 end
+        robot.turnLeft()
 end
 function turnRight()
-    dir = dir+1
-    if dir>3 then dir=0 end
-    robot.turnRight()
+        dir = dir+1
+        if dir>3 then dir=0 end
+        robot.turnRight()
 end
 function turnAround()
-    dir = dir+2
-    if dir>3 then dir=dir-4 end
-    robot.turnAround()
+        dir = dir+2
+        if dir>3 then dir=dir-4 end
+        robot.turnAround()
 end
 
 function place()
-  while not robot.placeDown() do
-    robot.swingDown()
-  end
+    while not robot.placeDown() do
+        robot.swingDown()
+    end
 end
  
 file = io.open(filename, "rb")
  
 a = 0
 while (a ~= nil) do
-  a = file:read(1)
-  if a == nil then break end
-  a = string.byte(a)
-  parse(a, file)
+    a = file:read(1)
+    if a == nil then break end
+    a = string.byte(a)
+    parse(a, file)
 end
  
 io.write("Length: " .. length)
-io.write("   Width: " .. width)
-io.write("   Height: " .. height .. "\n")
+io.write("     Width: " .. width)
+io.write("     Height: " .. height .. "\n")
  
 uniqueblocks={}
 for i,v in ipairs(blocks) do
-  -- no air =)
-  if v ~= 0 then
-    found = false
-    for j,w in ipairs(uniqueblocks) do
-      -- for now, data is only accounted for when the block is whool
-        if (w.blockID==v and (w.data==data[i] or w.blockID ~= 35)) then
-          found = true
-          w.amount = w.amount + 1
-        break
-      end
-    end
+    -- no air =)
+    if v ~= 0 then
+        found = false
+        for j,w in ipairs(uniqueblocks) do
+            -- for now, data is only accounted for when the block is whool
+                if (w.blockID==v and (w.data==data[i] or w.blockID ~= 35)) then
+                    found = true
+                    w.amount = w.amount + 1
+                break
+            end
+        end
 
-    if found==false then
-      uniqueblocks[#uniqueblocks+1] = {}
-      uniqueblocks[#uniqueblocks].blockID = v
-      uniqueblocks[#uniqueblocks].data = data[i]
-      uniqueblocks[#uniqueblocks].amount = 1
+        if found==false then
+            uniqueblocks[#uniqueblocks+1] = {}
+            uniqueblocks[#uniqueblocks].blockID = v
+            uniqueblocks[#uniqueblocks].data = data[i]
+            uniqueblocks[#uniqueblocks].amount = 1
+        end
     end
-  end
 end
  
 print("Number of block types: " .. #uniqueblocks)
 for i,v in ipairs(uniqueblocks) do
-  if (i%9)==0 then
-    io.read()
-  end
-  io.write(" " .. getBlockName(v.blockID, v.data) .. ": " .. v.amount .. ". ")
+    if (i%9)==0 then
+        io.read()
+    end
+    print("\n" .. getBlockName(v.blockID, v.data) .. ": " .. v.amount .. ". ")
 end
  
 io.read()
@@ -402,24 +400,24 @@ print("Give the numbers of all slots containing the specified block type:")
  
 slots={}
 for i,block in ipairs(uniqueblocks) do
-  blockData = block.data
-  io.write(" -in which slots is " .. getBlockName(block.blockID, blockData) .. "?")
-  if not slots[block.blockID] then
-    slots[block.blockID] = {}
-  end
-  slots[block.blockID][blockData] = {}
-  io.write("   ")
-  str = io.read()
-  io.write("\n")
-  for i = 1, #str do
-    local c = str:sub(i,i)
-    n = tonumber(c)
-    if(n) then
-      if(n>0 and n<10) then
-        table.insert(slots[block.blockID][blockData], n)
-      end
+    blockData = block.data
+    io.write(" -in which slots is " .. getBlockName(block.blockID, blockData) .. "?")
+    if not slots[block.blockID] then
+        slots[block.blockID] = {}
     end
-  end
+    slots[block.blockID][blockData] = {}
+    io.write("     ")
+    str = io.read()
+    io.write("\n")
+    for i = 1, #str do
+        local c = str:sub(i,i)
+        n = tonumber(c)
+        if(n) then
+            if(n>0 and n<10) then
+                table.insert(slots[block.blockID][blockData], n)
+            end
+        end
+    end
 end
  
 print("Press key to start building...")
@@ -430,66 +428,66 @@ n = 1
 robot.select(n)
  
 for y=1,height do
-  for x=1,width do
-    for z=1,length do
-      print("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..pos.z)
-      blockID = getBlockId(pos.y-1,pos.x,pos.z)
-      blockData = getData(pos.y-1,pos.x,pos.z)
-      if blockID == 0 then 
-        robot.swingDown()
-      else
-        slot_lst = slots[blockID][blockData]
-        if(slot_lst ~= nil) then
-          if(#slot_lst > 0) then
-            local found=false
-            for i,v in ipairs(slot_lst) do
-              if(robot.count(v) > 0) then
-                found=true
-                robot.select(v)
-                break
-              end
+    for x=1,width do
+        for z=1,length do
+            print("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..pos.z)
+            blockID = getBlockId(pos.y-1,pos.x,pos.z)
+            blockData = getData(pos.y-1,pos.x,pos.z)
+            if blockID == 0 then 
+                robot.swingDown()
+            else
+                slot_lst = slots[blockID][blockData]
+                if(slot_lst ~= nil) then
+                    if(#slot_lst > 0) then
+                        local found=false
+                        for i,v in ipairs(slot_lst) do
+                            if(robot.count(v) > 0) then
+                                found=true
+                                robot.select(v)
+                                break
+                            end
+                        end
+                        if not found then
+                            io.write("Not enough " .. getBlockName(blockID, blockData).." (")
+                            for i,v in ipairs(slot_lst) do
+                                io.write(v.." ")
+                            end
+                            io.write("\b). Please refill...\n")
+                            io.read()
+                        end
+                        place()
+                    end
+                end
             end
-            if not found then
-              io.write("Not enough " .. getBlockName(blockID, blockData).." (")
-              for i,v in ipairs(slot_lst) do
-                io.write(v.." ")
-              end
-              io.write("\b). Please refill...\n")
-              io.read()
-            end
-            place()
-          end
+            if z<length then forward() end
         end
-      end
-      if z<length then forward() end
-    end
-    if x<width then
-      if x%2 == 1 then 
-        turnLeft()
-        forward()
-        turnLeft()
-      else
-        turnRight()
-        forward()
-        turnRight()
-      end
-    else
-      if y<height then
-        if x%2 == 1 then 
-          turnAround()
-          up()
+        if x<width then
+            if x%2 == 1 then 
+                turnLeft()
+                forward()
+                turnLeft()
+            else
+                turnRight()
+                forward()
+                turnRight()
+            end
         else
-          turnLeft()
-          up()
+            if y<height then
+                if x%2 == 1 then 
+                    turnAround()
+                    up()
+                else
+                    turnLeft()
+                    up()
+                end
+            else
+                forward()
+            end
         end
-      else
-        forward()
-      end
     end
-  end
-  
+    
 end
 
 for i=1,height do
-  down()
+    down()
 end
