@@ -164,7 +164,8 @@ step = function(side, ignore) -- функция движения на 1 блок
 	local result, obstacle = robot.swing(side) 
 	if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
 		status('неразрушаемый блок')
-		home(true, false) -- запустить завершающую функцию
+		while robot.swing(side) do os.sleep(0) end
+		--home(true, false) -- запустить завершающую функцию
 		--report('insurmountable obstacle', true) -- послать сообщение
 	else
 		while robot.swing(side) do os.sleep(0) end -- копать пока возможно
@@ -474,6 +475,8 @@ local tool_charging = function()
 		if item then
 			now_charge = item.charge
 			max_charge = item.maxCharge
+		else
+			chest.equip()
 		end
 	end
 	chest.equip()
