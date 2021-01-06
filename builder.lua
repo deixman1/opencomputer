@@ -1,3 +1,5 @@
+-- Made by Totoro (25.06.2014)
+
 local robot = require("robot")
 local fs = require("filesystem")
 local shell = require("shell") 
@@ -391,7 +393,7 @@ for i,v in ipairs(uniqueblocks) do
     if (i%9)==0 then
         io.read()
     end
-    print("\n" .. getBlockName(v.blockID, v.data) .. ": " .. v.amount .. ". ")
+    print(" " .. getBlockName(v.blockID, v.data) .. ": " .. v.amount .. ". ")
 end
  
 io.read()
