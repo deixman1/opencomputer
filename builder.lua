@@ -24,7 +24,8 @@ if not fs.exists(filename) then
     print("File \""..filename.."\" does not exist!")
     --return
 end
- 
+
+local ignore = false
 local length = 0
 local height = 0
 local width = 0
@@ -315,8 +316,10 @@ dir = 0
 dir_backup = 0
 
 function forward()
-    while not robot.move(3) do
-        robot.swing(3)
+    if not ignore then
+        while not robot.move(3) do
+            robot.swing(3)
+        end
     end
     
     if dir == 0 then pos.x = pos.x+1
@@ -326,28 +329,38 @@ function forward()
     end
 end
 function up()
-    while not robot.move(1) do
-        robot.swing(1)
+    if not ignore then
+        while not robot.move(1) do
+            robot.swing(1)
+        end
     end
-    
     pos.y = pos.y+1
 end
 function down()
-    while not robot.move(0) do
-        robot.swing(0)
+    if not ignore then
+        while not robot.move(0) do
+            robot.swing(0)
+        end
     end
-    
     pos.y = pos.y-1
 end
 function turnLeft()
     dir = dir-1
-    if dir<0 then dir=3 end
-    robot.turn(false)
+    if dir < 0 then
+        dir = 3
+    end
+    if not ignore then
+        robot.turn(false)
+    end
 end
 function turnRight()
     dir = dir+1
-    if dir>3 then dir=0 end
-    robot.turn(true)
+    if dir > 3 then
+        dir = 0
+    end
+    if not ignore then
+        robot.turn(true)
+    end
 end
 
 function place()
@@ -516,8 +529,13 @@ for y=1,height do
             blockData = getData(pos.y-1,pos.x-1,pos.z)
             energy_level()
             if blockID == 0 then 
-                robot.swing(0)
+                --robot.swing(0)
+                ignore = true
             else
+                ignore = false
+                dir_backup = dir
+                go(pos.x, pos.y, pos.z)
+                smart_turn(dir_backup)
                 slot_lst = slots[blockID][blockData]
                 if(slot_lst ~= nil) then
                     if(#slot_lst > 0) then
@@ -573,6 +591,4 @@ for y=1,height do
     
 end
 
-for i=1,height do
-    down()
-end
+home()
