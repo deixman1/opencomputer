@@ -351,8 +351,8 @@ function turnRight()
 end
 
 function place()
-    while not robot.placeDown() do
-        robot.swingDown()
+    while not robot.place(0) do
+        robot.swing(0)
     end
 end
 
