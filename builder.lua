@@ -369,6 +369,20 @@ function energy_level()
     end
 end
 
+function turn(side) -- поворот в сторону
+    if side then
+        turnRight()
+    else
+        turnLeft()
+    end
+end
+
+function smart_turn(side) -- поворот в определенную сторону света
+    while dir ~= side do
+        turn((side-dir)%4==1)
+    end
+end
+
 function go(x, y, z) -- переход по указанным координатам
     while pos.y ~= y do
         if pos.y < y then
@@ -378,37 +392,20 @@ function go(x, y, z) -- переход по указанным координа�
         end
     end
     if pos.x < x then
-        smart_turn(3)
+        smart_turn(0)
     elseif pos.x > x then
-        smart_turn(1)
+        smart_turn(2)
     end
     while pos.x ~= x do
         forward()
     end
     if pos.z < z then
-        smart_turn(0)
+        smart_turn(3)
     elseif pos.z > z then
-        smart_turn(2)
+        smart_turn(1)
     end
     while pos.z ~= z do
         forward()
-    end
-end
-
-function turn(side) -- поворот в сторону
-    side = side or false
-    if robot.turn(side) and dir then -- если робот повернулся, обновить переменную    направления
-        if side then
-            dir = (dir+1)%4
-        else
-            dir = (dir-1)%4
-        end
-    end
-end
-
-function smart_turn(side) -- поворот в определенную сторону света
-    while dir ~= side do
-        turn((side-dir)%4==1)
     end
 end
 
