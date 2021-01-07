@@ -441,7 +441,6 @@ function main(y,x,z) -- переход к начальной точке и сб�
     if blockID == 0 then 
       --
     else
-        go(x + 1, y + 1, z)
         slot_lst = slots[blockID][blockData]
         if(slot_lst ~= nil) then
             if(#slot_lst > 0) then
@@ -461,6 +460,7 @@ function main(y,x,z) -- переход к начальной точке и сб�
                     io.write("\b). Please refill...\n")
                     io.read()
                 end
+                go(x + 1, y + 1, z)
                 place()
             end
         end
@@ -568,7 +568,7 @@ function recursion(y, w, l, circle) -- переход к начальной то
     if recursion(y, w - 1, l - 1, circle + 1) == 0 then
         return 0
     end
-    
+
     return circle
 end
 
