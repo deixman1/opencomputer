@@ -32,9 +32,9 @@ block_id[5] = "Деревянная доска 5"
 block_id[6] = "Саженец 6"
 block_id[7] = "Коренная порода 7"
 block_id[8] = "Вода 8"
-block_id[9] = "Стационарная вода 9"
+block_id[9] = "Блок воды 9"
 block_id[10] = "Лава 10"
-block_id[11] = "Неподвижная лава 11"
+block_id[11] = "Блок лавы 11"
 block_id[12] = "Песок 12"
 block_id[13] = "Гравий 13"
 block_id[14] = "Золотая руда 14"
@@ -300,7 +300,9 @@ function parse(a, file, containsName)
 end
 
 pos = {x=0, y=0, z=0}
+pos_backup = {x=0, y=0, z=0}
 dir = 0
+dir_backup = 0
 
 function forward()
     while not robot.forward() do
@@ -328,19 +330,19 @@ function down()
     pos.y = pos.y-1
 end
 function turnLeft()
-        dir = dir-1
-        if dir<0 then dir=3 end
-        robot.turnLeft()
+    dir = dir-1
+    if dir<0 then dir=3 end
+    robot.turnLeft()
 end
 function turnRight()
-        dir = dir+1
-        if dir>3 then dir=0 end
-        robot.turnRight()
+    dir = dir+1
+    if dir>3 then dir=0 end
+    robot.turnRight()
 end
 function turnAround()
-        dir = dir+2
-        if dir>3 then dir=dir-4 end
-        robot.turnAround()
+    dir = dir+2
+    if dir>3 then dir=dir-4 end
+    robot.turnAround()
 end
 
 function place()
@@ -348,7 +350,83 @@ function place()
         robot.swingDown()
     end
 end
- 
+
+function energy_level()
+    local energy = computer.energy()/computer.maxEnergy()
+    if energy < 0.3 then
+        home()
+        while energy < 0.98 do
+            print("Низкий заряд. Жду зарядки")
+            os.sleep(3)
+            energy = computer.energy()/computer.maxEnergy()
+        end
+        return_to_work()
+    end
+end
+
+function go(x, y, z) -- переход по указанным координатам
+    while pos.y ~= y do
+        if pos.y < y then
+            up()
+        elseif pos.y > y then
+            down()
+        end
+    end
+    if pos.x < x then
+        smart_turn(3)
+    elseif pos.x > x then
+        smart_turn(1)
+    end
+    while pos.x ~= x do
+        forward()
+    end
+    if pos.z < z then
+        smart_turn(0)
+    elseif pos.z > z then
+        smart_turn(2)
+    end
+    while pos.z ~= z do
+        forward()
+    end
+end
+
+function turn(side) -- поворот в сторону
+    side = side or false
+    if robot.turn(side) and dir then -- если робот повернулся, обновить переменную    направления
+        if side then
+            dir = (dir+1)%4
+        else
+            dir = (dir-1)%4
+        end
+    end
+end
+
+function smart_turn(side) -- поворот в определенную сторону света
+    while dir ~= side do
+        turn((side-dir)%4==1)
+    end
+end
+
+function home() -- переход к начальной точке и сброс лута
+    pos_backup.x = pos.x
+    pos_backup.y = pos.y
+    pos_backup.z = pos.z
+    dir_backup = dir
+    print('отправляюсь домой')
+    go(pos.x, 2, pos.z)
+    go(0, pos.y, 0)
+    print('прибыл домой')
+end
+
+function return_to_work() -- переход к начальной точке и сброс лута
+    status('возврат к работе')
+    go(0, pos_backup.y+2, 0)
+    go(pos_backup.x, pos_backup.y+2, pos_backup.z)
+    go(pos_backup.x, pos_backup.y, pos_backup.z)
+    smart_turn(dir_backup)
+    status('прибыл на работу')
+end
+
 file = io.open(filename, "rb")
  
 a = 0
@@ -359,9 +437,9 @@ while (a ~= nil) do
     parse(a, file)
 end
  
-io.write("Length: " .. length)
-io.write("     Width: " .. width)
-io.write("     Height: " .. height .. "\n")
+print("Length: " .. length)
+print("Width: " .. width)
+print("Height: " .. height)
  
 uniqueblocks={}
 for i,v in ipairs(blocks) do
@@ -433,6 +511,7 @@ for y=1,height do
             print("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..pos.z)
             blockID = getBlockId(pos.y-1,pos.x,pos.z)
             blockData = getData(pos.y-1,pos.x,pos.z)
+            energy_level()
             if blockID == 0 then 
                 robot.swingDown()
             else
@@ -459,7 +538,9 @@ for y=1,height do
                     end
                 end
             end
-            if z<length then forward() end
+            if z<length then
+                forward()
+            end
         end
         if x<width then
             if x%2 == 1 then 
