@@ -524,7 +524,9 @@ robot.select(n)
 for y=1,height do
     for x=1,width do
         for z=1,length do
-            print("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..pos.z-1)
+            local file = io.open("logs.txt", "a")
+            file:write("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..(pos.z-1))
+            file:close()
             blockID = getBlockId(pos.y-1,pos.x-1,pos.z)
             blockData = getData(pos.y-1,pos.x-1,pos.z)
             energy_level()
