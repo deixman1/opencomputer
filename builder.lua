@@ -534,6 +534,7 @@ for y=1,height do
             else
                 ignore = false
                 dir_backup = dir
+                smart_turn(dir)
                 go(pos.x, pos.y, pos.z)
                 smart_turn(dir_backup)
                 slot_lst = slots[blockID][blockData]
