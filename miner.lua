@@ -163,6 +163,7 @@ check = function(forcibly) -- проверка инструмента, бата�
 end
 
 step = function(side, ignore) -- функция движения на 1 блок
+	computer.beep()
     local result, obstacle = robot.swing(side) 
     if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
     	status('неразрушаемый блок')
