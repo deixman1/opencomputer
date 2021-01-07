@@ -315,8 +315,8 @@ dir = 0
 dir_backup = 0
 
 function forward()
-    while not robot.forward() do
-        robot.swing()
+    while not robot.move(3) do
+        robot.swing(3)
     end
     
     if dir == 0 then pos.x = pos.x+1
@@ -326,15 +326,15 @@ function forward()
     end
 end
 function up()
-    while not robot.up() do
-        robot.swingUp()
+    while not robot.move(1) do
+        robot.swing(1)
     end
     
     pos.y = pos.y+1
 end
 function down()
-    while not robot.down() do
-        robot.swingDown()
+    while not robot.move(0) do
+        robot.swing(0)
     end
     
     pos.y = pos.y-1
@@ -342,17 +342,12 @@ end
 function turnLeft()
     dir = dir-1
     if dir<0 then dir=3 end
-    robot.turnLeft()
+    robot.turn(false)
 end
 function turnRight()
     dir = dir+1
     if dir>3 then dir=0 end
-    robot.turnRight()
-end
-function turnAround()
-    dir = dir+2
-    if dir>3 then dir=dir-4 end
-    robot.turnAround()
+    robot.turn(true)
 end
 
 function place()
@@ -363,7 +358,7 @@ end
 
 function energy_level()
     local energy = computer.energy()/computer.maxEnergy()
-    if energy < 0.3 then
+    if energy < 0.1 then
         home()
         while energy < 0.98 do
             print("Низкий заряд. Жду зарядки")
@@ -566,7 +561,8 @@ for y=1,height do
         else
             if y<height then
                 if x%2 == 1 then 
-                    turnAround()
+                    turnRight()
+                    turnRight()
                     up()
                 else
                     turnLeft()
