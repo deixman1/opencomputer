@@ -14,7 +14,6 @@ local computer = require("computer")
 local chest = add_component('inventory_controller')
 local args = {...}
 
-
 if #args ~= 1 then
     print("Usage: build <filename>")
     return
