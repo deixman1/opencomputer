@@ -11,7 +11,7 @@ local robot = add_component("robot")
 local fs = require("filesystem")
 local shell = require("shell") 
 local computer = require("computer")
-local args = do...end
+local args = {...}
 
 if #args ~= 1 then
     print("Usage: build <filename>")
@@ -28,10 +28,10 @@ end
 local length = 0
 local height = 0
 local width = 0
-local blocks = doend
-local data = doend
+local blocks = {}
+local data = {}
  
-block_id = doend
+block_id = {}
  
 block_id[0] = "Воздух 0"
 block_id[1] = "Камень 1"
@@ -164,7 +164,7 @@ block_id[261] = "Лук 261"
 block_id[262] = "Стрелка 262"
 block_id[263] = "Уголь 263"
  
-wool = doend
+wool = {}
 wool[0] = "Белый"
 wool[1] = "Апельсин"
 wool[2] = "пурпурный"
@@ -309,8 +309,8 @@ function parse(a, file, containsName)
     end
 end
 
-pos = dox=0, y=0, z=0end
-pos_backup = dox=0, y=0, z=0end
+pos = {x=0, y=0, z=0}
+pos_backup = {x=0, y=0, z=0}
 dir = 0
 dir_backup = 0
 
@@ -479,7 +479,7 @@ print("Length: " .. length)
 print("Width: " .. width)
 print("Height: " .. height)
  
-uniqueblocks=doend
+uniqueblocks={}
 for i,v in ipairs(blocks) do
     if v ~= 0 then
         found = false
@@ -492,7 +492,7 @@ for i,v in ipairs(blocks) do
             end
         end
         if found==false then
-            uniqueblocks[#uniqueblocks+1] = doend
+            uniqueblocks[#uniqueblocks+1] = {}
             uniqueblocks[#uniqueblocks].blockID = v
             uniqueblocks[#uniqueblocks].data = data[i]
             uniqueblocks[#uniqueblocks].amount = 1
@@ -512,14 +512,14 @@ io.read()
  
 print("Give the numbers of all slots containing the specified block type:")
  
-slots=doend
+slots={}
 for i,block in ipairs(uniqueblocks) do
     blockData = block.data
     io.write(" -in which slots is " .. getBlockName(block.blockID, blockData) .. "?")
     if not slots[block.blockID] then
-        slots[block.blockID] = doend
+        slots[block.blockID] = {}
     end
-    slots[block.blockID][blockData] = doend
+    slots[block.blockID][blockData] = {}
     io.write("     ")
     str = io.read()
     io.write("\n")
