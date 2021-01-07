@@ -25,7 +25,6 @@ if not fs.exists(filename) then
     --return
 end
 
-ignore_move = false
 local length = 0
 local height = 0
 local width = 0
@@ -316,10 +315,8 @@ dir = 0
 dir_backup = 0
 
 function forward()
-    if not ignore_move then
-        while not robot.move(3) do
-            robot.swing(3)
-        end
+    while not robot.move(3) do
+        robot.swing(3)
     end
     
     if dir == 0 then pos.x = pos.x+1
@@ -329,18 +326,14 @@ function forward()
     end
 end
 function up()
-    if not ignore_move then
-        while not robot.move(1) do
-            robot.swing(1)
-        end
+    while not robot.move(1) do
+        robot.swing(1)
     end
     pos.y = pos.y+1
 end
 function down()
-    if not ignore_move then
-        while not robot.move(0) do
-            robot.swing(0)
-        end
+    while not robot.move(0) do
+        robot.swing(0)
     end
     pos.y = pos.y-1
 end
@@ -349,18 +342,14 @@ function turnLeft()
     if dir < 0 then
         dir = 3
     end
-    if not ignore_move then
-        robot.turn(false)
-    end
+    robot.turn(false)
 end
 function turnRight()
     dir = dir+1
     if dir > 3 then
         dir = 0
     end
-    if not ignore_move then
-        robot.turn(true)
-    end
+    robot.turn(true)
 end
 
 function place()
@@ -525,18 +514,13 @@ for y=1,height do
             local file = io.open("logs.txt", "a")
             file:write("\nX: "..pos.x..", Y: "..(pos.y-1)..", Z: "..(pos.z-1))
             file:close()
-            blockID = getBlockId(pos.y-1,pos.x-1,pos.z)
-            blockData = getData(pos.y-1,pos.x-1,pos.z)
+            blockID = getBlockId(y,x,z)
+            blockData = getData(y,x,z)
             energy_level()
             if blockID == 0 then 
                 --robot.swing(0)
-                ignore_move = true
             else
-                ignore_move = false
-                dir_backup = dir
-                smart_turn(dir_backup)
-                go(pos.x, pos.y, pos.z)
-                smart_turn(dir_backup)
+                go(pos.x + x, pos.y + y, pos.z + z)
                 slot_lst = slots[blockID][blockData]
                 if(slot_lst ~= nil) then
                     if(#slot_lst > 0) then
@@ -559,34 +543,6 @@ for y=1,height do
                         place()
                     end
                 end
-                ignore_move = true
-            end
-            if z<length then
-                forward()
-            end
-        end
-        if x<width then
-            if x%2 == 1 then 
-                turnLeft()
-                forward()
-                turnLeft()
-            else
-                turnRight()
-                forward()
-                turnRight()
-            end
-        else
-            if y<height then
-                if x%2 == 1 then 
-                    turnRight()
-                    turnRight()
-                    up()
-                else
-                    turnLeft()
-                    up()
-                end
-            else
-                forward()
             end
         end
     end
