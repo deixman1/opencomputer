@@ -1,4 +1,13 @@
-local robot = require("robot")
+local component = require('component')
+
+function add_component(name) -- получение прокси компонента
+    name = component.list(name)() -- получить адрес по имени
+    if name then -- если есть адрес
+        return component.proxy(name) -- вернуть прокси
+    end
+end
+
+local robot = add_component("robot")
 local fs = require("filesystem")
 local shell = require("shell") 
 local computer = require("computer")
@@ -420,12 +429,12 @@ function home() -- переход к начальной точке и сброс
 end
 
 function return_to_work() -- переход к начальной точке и сброс лута
-    status('возврат к работе')
+    print('возврат к работе')
     go(0, pos_backup.y+2, 0)
     go(pos_backup.x, pos_backup.y+2, pos_backup.z)
     go(pos_backup.x, pos_backup.y, pos_backup.z)
     smart_turn(dir_backup)
-    status('прибыл на работу')
+    print('прибыл на работу')
 end
 
 file = io.open(filename, "rb")
@@ -503,15 +512,16 @@ print("Press key to start building...")
 io.read()
  
 up()
+forward()
 n = 1
 robot.select(n)
  
 for y=1,height do
     for x=1,width do
         for z=1,length do
-            print("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..pos.z)
-            blockID = getBlockId(pos.y-1,pos.x,pos.z)
-            blockData = getData(pos.y-1,pos.x,pos.z)
+            print("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..pos.z-1)
+            blockID = getBlockId(pos.y-1,pos.x-1,pos.z)
+            blockData = getData(pos.y-1,pos.x-1,pos.z)
             energy_level()
             if blockID == 0 then 
                 robot.swingDown()
