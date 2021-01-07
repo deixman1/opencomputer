@@ -1,4 +1,5 @@
 local component = require('component')
+
 function add_component(name) -- получение прокси компонента
     name = component.list(name)() -- получить адрес по имени
     if name then -- если есть адрес
@@ -553,7 +554,7 @@ for i,v in ipairs(uniqueblocks) do
     if (i%9)==0 then
         io.read()
     end
-    print(" " .. v.blockID .. " - " .. v.data) .. ": " .. v.amount .. ". ")
+    print(" " .. v.blockID .. " - " .. v.data .. ": " .. v.amount .. ". ")
 end
 
 if #uniqueblocks > inventory then
@@ -593,6 +594,7 @@ str = io.read()
 if str == "n" then
     os.exit()
 end
+
 
 up()
 forward()
