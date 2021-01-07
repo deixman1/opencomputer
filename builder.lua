@@ -595,7 +595,6 @@ if str == "n" then
     os.exit()
 end
 
-
 up()
 forward()
 n = 1
