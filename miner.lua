@@ -517,6 +517,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
             end
         end
     end
+    smart_turn(0)
     status('выгружено')
     if forcibly then
         if robot.durability() < 0.98 then
