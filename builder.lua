@@ -554,7 +554,7 @@ for i,v in ipairs(uniqueblocks) do
     if (i%9)==0 then
         io.read()
     end
-    print(" " .. getBlockName(v.blockID, v.data) .. ": " .. v.amount .. ". ")
+    print(" " .. v.blockID .. " - " .. v.data) .. ": " .. v.amount .. ". ")
 end
 
 if #uniqueblocks > inventory then
@@ -575,7 +575,7 @@ slots={}
 slot_count = 1
 for i,block in ipairs(uniqueblocks) do
     blockData = block.data
-    io.write(" -расположение в слоте "..slot_count.." предмета: " .. getBlockName(block.blockID, blockData) .. "? [y/n]")
+    io.write(" -расположение в слоте "..slot_count.." предмета: " .. block.blockID .. " - " .. blockData) .. "? [y/n]")
     if not slots[block.blockID] then
         slots[block.blockID] = {}
     end
