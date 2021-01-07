@@ -25,7 +25,7 @@ if not fs.exists(filename) then
     --return
 end
 
-local ignore = true
+ignore_move = false
 local length = 0
 local height = 0
 local width = 0
@@ -316,7 +316,7 @@ dir = 0
 dir_backup = 0
 
 function forward()
-    if not ignore then
+    if not ignore_move then
         while not robot.move(3) do
             robot.swing(3)
         end
@@ -329,7 +329,7 @@ function forward()
     end
 end
 function up()
-    if not ignore then
+    if not ignore_move then
         while not robot.move(1) do
             robot.swing(1)
         end
@@ -337,7 +337,7 @@ function up()
     pos.y = pos.y+1
 end
 function down()
-    if not ignore then
+    if not ignore_move then
         while not robot.move(0) do
             robot.swing(0)
         end
@@ -349,7 +349,7 @@ function turnLeft()
     if dir < 0 then
         dir = 3
     end
-    if not ignore then
+    if not ignore_move then
         robot.turn(false)
     end
 end
@@ -358,7 +358,7 @@ function turnRight()
     if dir > 3 then
         dir = 0
     end
-    if not ignore then
+    if not ignore_move then
         robot.turn(true)
     end
 end
@@ -530,9 +530,9 @@ for y=1,height do
             energy_level()
             if blockID == 0 then 
                 --robot.swing(0)
-                ignore = true
+                ignore_move = true
             else
-                ignore = false
+                ignore_move = false
                 dir_backup = dir
                 smart_turn(dir_backup)
                 go(pos.x, pos.y, pos.z)
@@ -559,7 +559,7 @@ for y=1,height do
                         place()
                     end
                 end
-                ignore = true
+                ignore_move = true
             end
             if z<length then
                 forward()
