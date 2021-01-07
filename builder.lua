@@ -516,7 +516,7 @@ for y=1,height do
             blockData = getData(pos.y-1,pos.x-1,pos.z)
             energy_level()
             if blockID == 0 then 
-                robot.swingDown()
+                robot.swing(0)
             else
                 slot_lst = slots[blockID][blockData]
                 if(slot_lst ~= nil) then
