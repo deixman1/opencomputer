@@ -1,5 +1,4 @@
 local component = require('component')
-
 function add_component(name) -- получение прокси компонента
     name = component.list(name)() -- получить адрес по имени
     if name then -- если есть адрес
