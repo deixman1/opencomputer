@@ -14,6 +14,8 @@ local function arr2a_arr(tbl) -- преобразование списка в а
     end
 end
 
+
+component.proxy(component.list("inventory_controller")())
 local quads = {{-7, -7}, {-7, 1}, {1, -7}, {1, 1}}
 local workbench = {1,2,3,5,6,7,9,10,11}
 local wlist = {'enderstorage:ender_storage'}
@@ -167,6 +169,9 @@ step = function(side, ignore) -- функция движения на 1 блок
         while true do
             computer.beep()
             os.sleep(3)
+            if robot.swing(side) then
+            	break
+            end
         end
         --home(true, false) -- запустить завершающую функцию
         --report('insurmountable obstacle', true) -- послать сообщение
@@ -466,21 +471,22 @@ sorter = function(pack) -- сортировка лута
 end
 
 local tool_charging = function()
+	smart_turn(0)
     robot.select(1)
     chest.equip()
     local item = chest.getStackInInternalSlot(1)
     local now_charge = 0
     local max_charge = 1
+    robot.drop(3)
     while not(now_charge == max_charge) do
         status('ожидаю зарядки инструмента')
         sleep(30)
+        robot.suck(3)
         item = chest.getStackInInternalSlot(1)
         if item then
             now_charge = item.charge
             max_charge = item.maxCharge
         else
-            chest.equip()
-        end
     end
     chest.equip()
 end
@@ -498,13 +504,14 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     status('прибыл домой')
     sorter() -- сортировка инвентаря
     status('ожидание выгрузки')
+    smart_turn(2)
     for slot = 1, inventory do -- обойти весь инвентарь
         local item = chest.getStackInInternalSlot(slot)
         if item then -- если слот не пуст
             if not wlist[item.name] then -- если предмет не в белом списке
                 while item do
                     robot.select(slot) -- выбрать слот
-                    sleep(30)
+                    robot.drop(3)
                     item = chest.getStackInInternalSlot(slot)
                 end
             end
@@ -514,7 +521,6 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     if forcibly then
         if robot.durability() < 0.98 then
             status('пробуем зарядить инструмент')
-            robot.select(1)
             tool_charging()
             status('инструмент заряжен')
         end
