@@ -438,7 +438,10 @@ function main(y,x,z) -- переход к начальной точке и сб�
     blockID = getBlockId(y,x,z)
     blockData = getData(y,x,z)
     energy_level()
-    if blockID ~= 0 then 
+    if blockID == 0 then 
+      --
+    else
+        go(x + 1, y + 1, z)
         slot_lst = slots[blockID][blockData]
         if(slot_lst ~= nil) then
             if(#slot_lst > 0) then
@@ -458,7 +461,6 @@ function main(y,x,z) -- переход к начальной точке и сб�
                     io.write("\b). Please refill...\n")
                     io.read()
                 end
-                go(x + 1, y + 1, z)
                 place()
             end
         end
@@ -541,26 +543,44 @@ up()
 forward()
 n = 1
 robot.select(n)
- 
-for y = 0, (height - 1) do
-    local circles = math.ceil(width/2)-1
-    for j = 0, circles do
-        local w = (width - 1)
-        local l = (length - 1)
-        for z = (0 + j), (l - j) do
-            main(y, (0 + j), z)
-        end
-        for x = (1 + j), (w - j) do
-            main(y, x, (w - j))
-        end
-        for z = (l - 1 - j), 0, -1 do
-            main(y, (w - j), z)
-        end
-        for x = (w - 1 - j), 0, -1 do
-            main(y, x, (0 + j))
-        end
+
+function recursion(y, w, l, circle) -- переход к начальной точке и сброс лута
+    if circle > w or circle > l then
+        return 0
     end
+
+    for z = circle, l - 1 do
+        main(y, circle, z)
+    end
+
+    for x = circle, w - 1 do
+        main(y, x, l)
+    end
+    
+    for z = l, circle + 1, -1 do
+        main(y, w, z)
+    end
+    
+    for x = w, circle + 1, -1 do
+        main(y, x, circle)
+    end
+
+    if recursion(y, w - 1, l - 1, circle + 1) == 0 then
+        return 0
+    end
+    
+    return circle
 end
+
+for y = 0, (height - 1) do
+    recursion(y, (width - 1), (length - 1), 0)
+end
+
+--1 2 3 4
+--4 5 6 4 
+--1 2 3 4
+--1 2 3 4
+--1 2 3 4
 
 home()
 
