@@ -471,7 +471,7 @@ function main(y,x,z) -- переход к начальной точке и сб�
                     end
                 end
                 if not found then
-                    io.write("Not enough " .. blockID.." - ".. blockData).." (")
+                    io.write("Not enough " .. blockID.." - ".. blockData.." (")
                     for i,v in ipairs(slot_lst) do
                         io.write(v.." ")
                     end
@@ -575,7 +575,7 @@ slots={}
 slot_count = 1
 for i,block in ipairs(uniqueblocks) do
     blockData = block.data
-    io.write(" -расположение в слоте "..slot_count.." предмета: " .. block.blockID .. " - " .. blockData) .. "? [y/n]")
+    io.write(" -расположение в слоте "..slot_count.." предмета: " ..block.blockID.. " - ".. blockData .. "? [y/n]")
     if not slots[block.blockID] then
         slots[block.blockID] = {}
     end
