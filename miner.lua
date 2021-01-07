@@ -477,8 +477,8 @@ local tool_charging = function()
     local item = chest.getStackInInternalSlot(1)
     local now_charge = 0
     local max_charge = 1
-    robot.drop(3)
     while not(now_charge == max_charge) do
+    	robot.drop(3)
         status('ожидаю зарядки инструмента')
         sleep(30)
         robot.suck(3)
@@ -486,7 +486,7 @@ local tool_charging = function()
         if item then
             now_charge = item.charge
             max_charge = item.maxCharge
-        else
+        end
     end
     chest.equip()
 end
