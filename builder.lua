@@ -1,6 +1,7 @@
 local robot = require("robot")
 local fs = require("filesystem")
 local shell = require("shell") 
+local computer = require("computer")
 local args = {...}
 
 if #args ~= 1 then
