@@ -25,7 +25,7 @@ if not fs.exists(filename) then
     --return
 end
 
-local ignore = false
+local ignore = true
 local length = 0
 local height = 0
 local width = 0
@@ -458,21 +458,22 @@ print("Height: " .. height)
  
 uniqueblocks={}
 for i,v in ipairs(blocks) do
-    found = false
-    for j,w in ipairs(uniqueblocks) do
-        -- for now, data is only accounted for when the block is whool
-            if (w.blockID==v and (w.data==data[i] or w.blockID ~= 35)) then
-                found = true
-                w.amount = w.amount + 1
-            break
+    if v ~= 0 then
+        found = false
+        for j,w in ipairs(uniqueblocks) do
+            -- for now, data is only accounted for when the block is whool
+                if (w.blockID==v and (w.data==data[i] or w.blockID ~= 35)) then
+                    found = true
+                    w.amount = w.amount + 1
+                break
+            end
         end
-    end
-
-    if found==false then
-        uniqueblocks[#uniqueblocks+1] = {}
-        uniqueblocks[#uniqueblocks].blockID = v
-        uniqueblocks[#uniqueblocks].data = data[i]
-        uniqueblocks[#uniqueblocks].amount = 1
+        if found==false then
+            uniqueblocks[#uniqueblocks+1] = {}
+            uniqueblocks[#uniqueblocks].blockID = v
+            uniqueblocks[#uniqueblocks].data = data[i]
+            uniqueblocks[#uniqueblocks].amount = 1
+        end
     end
 end
  
@@ -532,8 +533,10 @@ for y=1,height do
                 ignore = true
             else
                 ignore = false
-                smart_turn(dir)
+                dir_backup = dir
+                smart_turn(dir_backup)
                 go(pos.x, pos.y, pos.z)
+                smart_turn(dir_backup)
                 slot_lst = slots[blockID][blockData]
                 if(slot_lst ~= nil) then
                     if(#slot_lst > 0) then
@@ -556,6 +559,7 @@ for y=1,height do
                         place()
                     end
                 end
+                ignore = true
             end
             if z<length then
                 forward()
@@ -590,4 +594,3 @@ for y=1,height do
 end
 
 home()
-
