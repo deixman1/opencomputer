@@ -458,24 +458,21 @@ print("Height: " .. height)
  
 uniqueblocks={}
 for i,v in ipairs(blocks) do
-    -- no air =)
-    if v ~= 0 then
-        found = false
-        for j,w in ipairs(uniqueblocks) do
-            -- for now, data is only accounted for when the block is whool
-                if (w.blockID==v and (w.data==data[i] or w.blockID ~= 35)) then
-                    found = true
-                    w.amount = w.amount + 1
-                break
-            end
+    found = false
+    for j,w in ipairs(uniqueblocks) do
+        -- for now, data is only accounted for when the block is whool
+            if (w.blockID==v and (w.data==data[i] or w.blockID ~= 35)) then
+                found = true
+                w.amount = w.amount + 1
+            break
         end
+    end
 
-        if found==false then
-            uniqueblocks[#uniqueblocks+1] = {}
-            uniqueblocks[#uniqueblocks].blockID = v
-            uniqueblocks[#uniqueblocks].data = data[i]
-            uniqueblocks[#uniqueblocks].amount = 1
-        end
+    if found==false then
+        uniqueblocks[#uniqueblocks+1] = {}
+        uniqueblocks[#uniqueblocks].blockID = v
+        uniqueblocks[#uniqueblocks].data = data[i]
+        uniqueblocks[#uniqueblocks].amount = 1
     end
 end
  
@@ -525,7 +522,7 @@ for y=1,height do
     for x=1,width do
         for z=1,length do
             local file = io.open("logs.txt", "a")
-            file:write("X: "..pos.x..", Y: "..(pos.y-1)..", Z: "..(pos.z-1))
+            file:write("\nX: "..pos.x1..", Y: "..(pos.y-1)3..", Z: "..(pos.z-1)12)
             file:close()
             blockID = getBlockId(pos.y-1,pos.x-1,pos.z)
             blockData = getData(pos.y-1,pos.x-1,pos.z)
@@ -535,10 +532,8 @@ for y=1,height do
                 ignore = true
             else
                 ignore = false
-                dir_backup = dir
                 smart_turn(dir)
                 go(pos.x, pos.y, pos.z)
-                smart_turn(dir_backup)
                 slot_lst = slots[blockID][blockData]
                 if(slot_lst ~= nil) then
                     if(#slot_lst > 0) then
