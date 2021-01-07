@@ -471,7 +471,7 @@ function main(y,x,z) -- переход к начальной точке и сб�
                     end
                 end
                 if not found then
-                    io.write("Not enough " .. getBlockName(blockID, blockData).." (")
+                    io.write("Not enough " .. blockID.." - ".. blockData).." (")
                     for i,v in ipairs(slot_lst) do
                         io.write(v.." ")
                     end
