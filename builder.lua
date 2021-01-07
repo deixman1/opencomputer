@@ -11,7 +11,7 @@ local robot = add_component("robot")
 local fs = require("filesystem")
 local shell = require("shell") 
 local computer = require("computer")
-local args = {...}
+local args = do...end
 
 if #args ~= 1 then
     print("Usage: build <filename>")
@@ -28,10 +28,10 @@ end
 local length = 0
 local height = 0
 local width = 0
-local blocks = {}
-local data = {}
+local blocks = doend
+local data = doend
  
-block_id = {}
+block_id = doend
  
 block_id[0] = "Воздух 0"
 block_id[1] = "Камень 1"
@@ -164,7 +164,7 @@ block_id[261] = "Лук 261"
 block_id[262] = "Стрелка 262"
 block_id[263] = "Уголь 263"
  
-wool = {}
+wool = doend
 wool[0] = "Белый"
 wool[1] = "Апельсин"
 wool[2] = "пурпурный"
@@ -309,8 +309,8 @@ function parse(a, file, containsName)
     end
 end
 
-pos = {x=0, y=0, z=0}
-pos_backup = {x=0, y=0, z=0}
+pos = dox=0, y=0, z=0end
+pos_backup = dox=0, y=0, z=0end
 dir = 0
 dir_backup = 0
 
@@ -431,6 +431,40 @@ function return_to_work() -- переход к начальной точке и 
     print('прибыл на работу')
 end
 
+function main(y,x,z) -- переход к начальной точке и сброс лута
+    local file = io.open("logs.txt", "a")
+    file:write("\nX: "..pos.x..", Y: "..pos.y..", Z: "..pos.z)
+    file:close()
+    blockID = getBlockId(y,x,z)
+    blockData = getData(y,x,z)
+    energy_level()
+    if blockID ~= 0 then 
+        slot_lst = slots[blockID][blockData]
+        if(slot_lst ~= nil) then
+            if(#slot_lst > 0) then
+                local found=false
+                for i,v in ipairs(slot_lst) do
+                    if(robot.count(v) > 0) then
+                        found=true
+                        robot.select(v)
+                        break
+                    end
+                end
+                if not found then
+                    io.write("Not enough " .. getBlockName(blockID, blockData).." (")
+                    for i,v in ipairs(slot_lst) do
+                        io.write(v.." ")
+                    end
+                    io.write("\b). Please refill...\n")
+                    io.read()
+                end
+                go(x + 1, y + 1, z)
+                place()
+            end
+        end
+    end
+end
+
 file = io.open(filename, "rb")
  
 a = 0
@@ -445,7 +479,7 @@ print("Length: " .. length)
 print("Width: " .. width)
 print("Height: " .. height)
  
-uniqueblocks={}
+uniqueblocks=doend
 for i,v in ipairs(blocks) do
     if v ~= 0 then
         found = false
@@ -458,7 +492,7 @@ for i,v in ipairs(blocks) do
             end
         end
         if found==false then
-            uniqueblocks[#uniqueblocks+1] = {}
+            uniqueblocks[#uniqueblocks+1] = doend
             uniqueblocks[#uniqueblocks].blockID = v
             uniqueblocks[#uniqueblocks].data = data[i]
             uniqueblocks[#uniqueblocks].amount = 1
@@ -478,14 +512,14 @@ io.read()
  
 print("Give the numbers of all slots containing the specified block type:")
  
-slots={}
+slots=doend
 for i,block in ipairs(uniqueblocks) do
     blockData = block.data
     io.write(" -in which slots is " .. getBlockName(block.blockID, blockData) .. "?")
     if not slots[block.blockID] then
-        slots[block.blockID] = {}
+        slots[block.blockID] = doend
     end
-    slots[block.blockID][blockData] = {}
+    slots[block.blockID][blockData] = doend
     io.write("     ")
     str = io.read()
     io.write("\n")
@@ -508,45 +542,26 @@ forward()
 n = 1
 robot.select(n)
  
-for y=1,height do
-    for x=1,width do
-        for z=1,length do
-            local file = io.open("logs.txt", "a")
-            file:write("\nX: "..pos.x..", Y: "..pos.y..", Z: "..pos.z)
-            file:close()
-            blockID = getBlockId(y-1,x-1,z-1)
-            blockData = getData(y-1,x-1,z-1)
-            energy_level()
-            if blockID == 0 then 
-                --robot.swing(0)
-            else
-                slot_lst = slots[blockID][blockData]
-                if(slot_lst ~= nil) then
-                    if(#slot_lst > 0) then
-                        local found=false
-                        for i,v in ipairs(slot_lst) do
-                            if(robot.count(v) > 0) then
-                                found=true
-                                robot.select(v)
-                                break
-                            end
-                        end
-                        if not found then
-                            io.write("Not enough " .. getBlockName(blockID, blockData).." (")
-                            for i,v in ipairs(slot_lst) do
-                                io.write(v.." ")
-                            end
-                            io.write("\b). Please refill...\n")
-                            io.read()
-                        end
-                        go((x - 1) + 1, (y - 1) + 1, (z - 1))
-                        place()
-                    end
-                end
-            end
+for y = 0, (height - 1) do
+    local circles = math.ceil(width/2)-1
+    for j = 0, circles do
+        local w = (width - 1)
+        local l = (length - 1)
+        for z = (0 + j), (l - j) do
+            main(y, (0 + j), z)
+        end
+        for x = (1 + j), (w - j) do
+            main(y, x, (w - j))
+        end
+        for z = (l - 1 - j), 0, -1 do
+            main(y, (w - j), z)
+        end
+        for x = (w - 1 - j), 0, -1 do
+            main(y, x, (0 + j))
         end
     end
-    
 end
 
 home()
+
+print('работа выполнена')
