@@ -11,6 +11,7 @@ local robot = add_component("robot")
 local fs = require("filesystem")
 local shell = require("shell") 
 local computer = require("computer")
+local chest = add_component('inventory_controller')
 local args = {...}
 
 if #args ~= 1 then
@@ -25,6 +26,7 @@ if not fs.exists(filename) then
     --return
 end
 
+local inventory = robot.inventorySize()
 local length = 0
 local height = 0
 local width = 0
@@ -431,6 +433,22 @@ function return_to_work() -- переход к начальной точке и 
     print('прибыл на работу')
 end
 
+function refilling()
+    side = 1
+    while true do -- войти в бесконечный цикл
+        if side == 4 then side = 1 end
+        size = chest.getInventorySize(3) -- получение размера инвентаря
+        if size and size>26 then -- если контейнер найден
+            break -- прервать поиск
+        end
+        turn() -- повернуться
+        side = side + 1 
+    end
+    while true do
+
+    end
+end
+
 function main(y,x,z) -- переход к начальной точке и сброс лута
     local file = io.open("logs.txt", "a")
     file:write("\nX: "..pos.x..", Y: "..pos.y..", Z: "..pos.z)
@@ -457,14 +475,43 @@ function main(y,x,z) -- переход к начальной точке и сб�
                     for i,v in ipairs(slot_lst) do
                         io.write(v.." ")
                     end
-                    io.write("\b). Please refill...\n")
-                    io.read()
+                    print('Пытаюсь восполнить')
+                    home()
+                    refilling()
                 end
                 go(x + 1, y + 1, z)
                 place()
             end
         end
     end
+end
+
+function recursion(y, w, l, circle) -- переход к начальной точке и сброс лута
+    if circle > w or circle > l then
+        return 0
+    end
+
+    for z = circle, l - 1 do
+        main(y, circle, z)
+    end
+
+    for x = circle, w - 1 do
+        main(y, x, l)
+    end
+    
+    for z = l, circle + 1, -1 do
+        main(y, w, z)
+    end
+    
+    for x = w, circle + 1, -1 do
+        main(y, x, circle)
+    end
+
+    if recursion(y, w - 1, l - 1, circle + 1) == 0 then
+        return 0
+    end
+
+    return circle
 end
 
 file = io.open(filename, "rb")
@@ -509,15 +556,26 @@ for i,v in ipairs(uniqueblocks) do
     end
     print(" " .. getBlockName(v.blockID, v.data) .. ": " .. v.amount .. ". ")
 end
- 
+
+if #uniqueblocks > inventory then
+    print("инвентарь "..inventory)
+    print("блоков "..#uniqueblocks)
+    print("Количество блоков в схеме больше размера инвентаря робота. Продолжить? [y/n]")
+    str = io.read()
+    if str == "n" then
+        os.exit()
+    end
+end
+
 io.read()
  
 print("Give the numbers of all slots containing the specified block type:")
  
 slots={}
+slot_count = 1
 for i,block in ipairs(uniqueblocks) do
     blockData = block.data
-    io.write(" -in which slots is " .. getBlockName(block.blockID, blockData) .. "?")
+    io.write(" -расположение в слоте "..slot_count.." предмета: " .. getBlockName(block.blockID, blockData) .. "? [y/n]")
     if not slots[block.blockID] then
         slots[block.blockID] = {}
     end
@@ -525,62 +583,27 @@ for i,block in ipairs(uniqueblocks) do
     io.write("     ")
     str = io.read()
     io.write("\n")
-    for i = 1, #str do
-        local c = str:sub(i,i)
-        n = tonumber(c)
-        if(n) then
-            if(n>0 and n<10) then
-                table.insert(slots[block.blockID][blockData], n)
-            end
-        end
+    if str == "y" then
+        table.insert(slots[block.blockID][blockData], slot_count)
+        slot_count = slot_count + 1
     end
 end
  
-print("Press key to start building...")
-io.read()
- 
+print("Начать строительство? [y/n]")
+str = io.read()
+if str == "n" then
+    os.exit()
+end
+
+
 up()
 forward()
 n = 1
 robot.select(n)
 
-function recursion(y, w, l, circle) -- переход к начальной точке и сброс лута
-    if circle > w or circle > l then
-        return 0
-    end
-
-    for z = circle, l - 1 do
-        main(y, circle, z)
-    end
-
-    for x = circle, w - 1 do
-        main(y, x, l)
-    end
-    
-    for z = l, circle + 1, -1 do
-        main(y, w, z)
-    end
-    
-    for x = w, circle + 1, -1 do
-        main(y, x, circle)
-    end
-
-    if recursion(y, w - 1, l - 1, circle + 1) == 0 then
-        return 0
-    end
-
-    return circle
-end
-
 for y = 0, (height - 1) do
     recursion(y, (width - 1), (length - 1), 0)
 end
-
---1 2 3 4
---4 5 6 4 
---1 2 3 4
---1 2 3 4
---1 2 3 4
 
 home()
 
