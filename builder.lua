@@ -512,15 +512,14 @@ for y=1,height do
     for x=1,width do
         for z=1,length do
             local file = io.open("logs.txt", "a")
-            file:write("\nX: "..pos.x..", Y: "..(pos.y-1)..", Z: "..(pos.z-1))
+            file:write("\nX: "..pos.x..", Y: "..pos.y..", Z: "..pos.z)
             file:close()
-            blockID = getBlockId(y,x,z)
-            blockData = getData(y,x,z)
+            blockID = getBlockId(y-1,x-1,z-1)
+            blockData = getData(y-1,x-1,z-1)
             energy_level()
             if blockID == 0 then 
                 --robot.swing(0)
             else
-                go(pos.x + x, pos.y + y, pos.z + z)
                 slot_lst = slots[blockID][blockData]
                 if(slot_lst ~= nil) then
                     if(#slot_lst > 0) then
@@ -540,6 +539,7 @@ for y=1,height do
                             io.write("\b). Please refill...\n")
                             io.read()
                         end
+                        go((x - 1) + 1, (y - 1) + 1, (z - 1))
                         place()
                     end
                 end
