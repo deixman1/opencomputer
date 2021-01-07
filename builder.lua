@@ -362,6 +362,7 @@ function energy_level()
         home()
         while energy < 0.98 do
             print("Низкий заряд. Жду зарядки")
+            computer.beep()
             os.sleep(3)
             energy = computer.energy()/computer.maxEnergy()
         end
@@ -415,14 +416,13 @@ function home() -- переход к начальной точке и сброс
     pos_backup.z = pos.z
     dir_backup = dir
     print('отправляюсь домой')
-    go(pos.x, 2, pos.z)
-    go(0, pos.y, 0)
+    go(0, pos.y+2, 0)
+    go(0, 0, 0)
     print('прибыл домой')
 end
 
 function return_to_work() -- переход к начальной точке и сброс лута
     print('возврат к работе')
-    go(0, pos_backup.y+2, 0)
     go(pos_backup.x, pos_backup.y+2, pos_backup.z)
     go(pos_backup.x, pos_backup.y, pos_backup.z)
     smart_turn(dir_backup)
