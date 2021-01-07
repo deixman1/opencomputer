@@ -522,7 +522,7 @@ for y=1,height do
     for x=1,width do
         for z=1,length do
             local file = io.open("logs.txt", "a")
-            file:write("\nX: "..pos.x1..", Y: "..(pos.y-1)3..", Z: "..(pos.z-1)12)
+            file:write("\nX: "..pos.x..", Y: "..(pos.y-1)..", Z: "..(pos.z-1))
             file:close()
             blockID = getBlockId(pos.y-1,pos.x-1,pos.z)
             blockData = getData(pos.y-1,pos.x-1,pos.z)
