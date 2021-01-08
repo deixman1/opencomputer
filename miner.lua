@@ -241,9 +241,8 @@ check = function(forcibly) -- проверка инструмента, бата�
 end
 
 step = function(side, ignore) -- функция движения на 1 блок
-    computer.beep()
     local result, obstacle = robot_detect[side]()
-    if not result and obstacle ~= 'air' then -- если блок нельзя разрушить
+    if not result and (obstacle ~= 'air' or obstacle ~= 'liquid') then -- если блок нельзя разрушить todo
         status('неразрушаемый блок')
         while true do
             computer.beep()
@@ -255,7 +254,7 @@ step = function(side, ignore) -- функция движения на 1 блок
         --home(true, false) -- запустить завершающую функцию
         --report('insurmountable obstacle', true) -- послать сообщение
     else
-    	if obstacle ~= 'air' then
+    	if obstacle ~= 'air' or obstacle ~= 'liquid' then
             broke[tool_type_4810](side) -- копать пока возможно
         end
     end
