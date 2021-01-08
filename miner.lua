@@ -178,6 +178,10 @@ local energy_tool_check = {
 	[false] = function() return false end,
 }
 
+check_robot_status = {
+
+}
+
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
     if not ignore_check and (steps%32 == 0 or forcibly) then -- если пройдено 32 шага или включен принудительный режим
         inv_check()
@@ -606,7 +610,6 @@ main = function()
         for q = 1, 4 do
             scan(table.unpack(quads[q]))
         end
-        check(true)
     end
     while #WORLD.x ~= 0 do
         os.sleep(0)
