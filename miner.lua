@@ -97,50 +97,50 @@ remove_point = function(point) -- удаление меток
 end
 
 local robot_suck = {
-	[0] = function() return robot.suckDown() end,
-	[1] = function() return robot.suckUp() end,
-	[2] = function() return false end,
-	[3] = function() return robot.suck() end,
+    [0] = function() return robot.suckDown() end,
+    [1] = function() return robot.suckUp() end,
+    [2] = function() return false end,
+    [3] = function() return robot.suck() end,
 }
 
 local robot_drop = {
-	[0] = function() return robot.dropDown() end,
-	[1] = function() return robot.dropUp() end,
-	[2] = function() return false end,
-	[3] = function() return robot.drop() end,
+    [0] = function() return robot.dropDown() end,
+    [1] = function() return robot.dropUp() end,
+    [2] = function() return false end,
+    [3] = function() return robot.drop() end,
 }
 
 local robot_use = {
-	[0] = function() return robot.useDown() end,
-	[1] = function() return robot.useUp() end,
-	[2] = function() return false end,
-	[3] = function() return robot.use(3) end,
+    [0] = function() return robot.useDown() end,
+    [1] = function() return robot.useUp() end,
+    [2] = function() return false end,
+    [3] = function() return robot.use(3) end,
 }
 
 local robot_swing = {
-	[0] = function() return robot.swingDown() end,
-	[1] = function() return robot.swingUp() end,
-	[2] = function() return false end,
-	[3] = function() return robot.swing(3) end,
+    [0] = function() return robot.swingDown() end,
+    [1] = function() return robot.swingUp() end,
+    [2] = function() return false end,
+    [3] = function() return robot.swing(3) end,
 }
 
 local robot_detect = {
-	[0] = function() return robot.detectDown() end,
-	[1] = function() return robot.detectUp() end,
-	[2] = function() return false end,
-	[3] = function() return robot.detect() end,
+    [0] = function() return robot.detectDown() end,
+    [1] = function() return robot.detectUp() end,
+    [2] = function() return false end,
+    [3] = function() return robot.detect() end,
 }
 
 local robot_move = {
-	[0] = function() return robot.down() end,
-	[1] = function() return robot.up() end,
-	[2] = function() return robot.back() end,
-	[3] = function() return robot.forward() end,
+    [0] = function() return robot.down() end,
+    [1] = function() return robot.up() end,
+    [2] = function() return robot.back() end,
+    [3] = function() return robot.forward() end,
 }
 
 local robot_turn_side = {
-	[true] = function() robot.turnRight() end,
-	[false] = function() robot.turnLeft() end,
+    [true] = function() robot.turnRight() end,
+    [false] = function() robot.turnLeft() end,
 }
 
 
@@ -159,23 +159,23 @@ end
 
 smart_turn = function(side) -- поворот в определенную сторону света
     while D ~= side do
-    	robot_turn((side-D)%4==1)
+        robot_turn((side-D)%4==1)
     end
 end
 
 local broke = {
-	[true] = function(side) return robot_use[side]() end,
-	[false] = function(side) return robot_swing[side]() end,
+    [true] = function(side) return robot_use[side]() end,
+    [false] = function(side) return robot_swing[side]() end,
 }
 
 local energy_robot_check = {
-	[true] = function() status('низкий заряд') home(true, false) end,
-	[false] = function() return false end,
+    [true] = function() status('низкий заряд') home(true, false) end,
+    [false] = function() return false end,
 }
 
 local energy_tool_check = {
-	[true] = function() status('инструмент изношен') home(true, false) end,
-	[false] = function() return false end,
+    [true] = function() status('инструмент изношен') home(true, false) end,
+    [false] = function() return false end,
 }
 
 check_robot_status = {
@@ -254,7 +254,7 @@ step = function(side, ignore) -- функция движения на 1 блок
         --home(true, false) -- запустить завершающую функцию
         --report('insurmountable obstacle', true) -- послать сообщение
     else
-    	if obstacle ~= 'air' and obstacle ~= 'liquid' then
+        if obstacle ~= 'air' and obstacle ~= 'liquid' then
             broke[tool_type_4810](side) -- копать пока возможно
         end
     end
@@ -385,19 +385,23 @@ calibration = function() -- калибровка при запуске
     D = nil -- обнуление направления
     status('проверка всех направлений')
     for s = 1, #sides do -- проверка всех направлений
-        if robot_detect[3]() then -- проверить наличие блока перед носом
-            local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
-            broke[tool_type_4810](3) -- сломать блок
-            local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
-            for n = 2, 8, 2 do -- обойти смежные блоки в таблице
-                if math.ceil(B[n])-math.ceil(A[n])<0 then -- если блок исчез
-                    D = sides[n/2] -- установить новое направление
-                    break -- выйти из цикла
+        if not D then
+            if robot_detect[3]() or robot.place(3) then -- проверить наличие блока перед носом
+                local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
+                broke[tool_type_4810](3) -- сломать блок
+                local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
+                for n = 2, 8, 2 do -- обойти смежные блоки в таблице
+                    if math.ceil(B[n])-math.ceil(A[n])<0 then -- если блок исчез
+                        D = sides[n/2] -- установить новое направление
+                        break -- выйти из цикла
+                    end
                 end
+            else
+                status('поворот')
+                robot_turn() -- задействовать простой поворот
             end
         else
-            status('поворот')
-            robot_turn() -- задействовать простой поворот
+            break
         end
     end
     if not D then
