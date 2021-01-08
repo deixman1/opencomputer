@@ -455,7 +455,7 @@ function home() -- переход к начальной точке и сброс
     print('отправляюсь домой')
     go(0, pos.y+2, 0)
     go(0, 0, 0)
-    smart_turn(2)
+    smart_turn(side_home)
     print('прибыл домой')
     position_at_home = true
 end
@@ -470,7 +470,7 @@ function return_to_work() -- переход к начальной точке и 
 end
 
 function refilling(slot, name)
-    smart_turn(2)
+    smart_turn(side_home)
     robot.suck()
     while robot.count(slot) > 0 do
         computer.beep()
@@ -628,6 +628,12 @@ if str == "n" then
     os.exit()
 end
 
+
+turn()
+turn()
+local side_home = dir
+turn()
+turn()
 
 up()
 forward()
