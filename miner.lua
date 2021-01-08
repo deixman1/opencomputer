@@ -14,8 +14,7 @@ local function arr2a_arr(tbl) -- преобразование списка в а
     end
 end
 
-
-component.proxy(component.list("inventory_controller")())
+local tool_type_4810 = true
 local quads = {{-7, -7}, {-7, 1}, {1, -7}, {1, 1}}
 local workbench = {1,2,3,5,6,7,9,10,11}
 local wlist = {'enderstorage:ender_storage'}
@@ -96,6 +95,13 @@ remove_point = function(point) -- удаление меток
     table.remove(WORLD.z, point)
 end
 
+swing = function(side)
+	if tool_type_4810 then
+		return robot.use(side, true)
+	else
+		return robot.swing(side)
+end
+
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
     if not ignore_check and (steps%32 == 0 or forcibly) then -- если пройдено 32 шага или включен принудительный режим
         inv_check()
@@ -147,14 +153,14 @@ check = function(forcibly) -- проверка инструмента, бата�
     if #WORLD.x ~= 0 then -- если таблица меток не пуста
         for i = 1, #WORLD.x do -- пройти по всем позициям
             if WORLD.y[i] == Y and ((WORLD.x[i] == X and ((WORLD.z[i] == Z+1 and D == 0) or (WORLD.z[i] == Z-1 and D == 2))) or (WORLD.z[i] == Z and ((WORLD.x[i] == X+1 and D == 3) or (WORLD.x[i] == X-1 and D == 1)))) then
-                robot.swing(3)
+                swing(3)
                 remove_point(i)
             end
             if X == WORLD.x[i] and (Y-1 <= WORLD.y[i] and Y+1 >= WORLD.y[i]) and Z == WORLD.z[i] then
                 if WORLD.y[i] == Y+1 then -- добыть блок сверху, если есть
-                    robot.swing(1)
+                    swing(1)
                 elseif WORLD.y[i] == Y-1 then -- добыть блок снизу
-                    robot.swing(0)
+                    swing(0)
                 end
                 remove_point(i)
             end
@@ -164,20 +170,20 @@ end
 
 step = function(side, ignore) -- функция движения на 1 блок
 	computer.beep()
-    local result, obstacle = robot.swing(side) 
+    local result, obstacle = swing(side) 
     if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
     	status('неразрушаемый блок')
         while true do
             computer.beep()
             os.sleep(3)
-            if robot.swing(side) then
+            if swing(side) then
             	break
             end
         end
         --home(true, false) -- запустить завершающую функцию
         --report('insurmountable obstacle', true) -- послать сообщение
     else
-        robot.swing(side) -- копать пока возможно
+        swing(side) -- копать пока возможно
     end
     if robot.move(side) then -- если робот сдвинулся, обновить координаты
         steps = steps + 1 -- debug
@@ -314,7 +320,7 @@ calibration = function() -- калибровка при запуске
     status('расчет расхода энергии за блок')
     while energy == robot.durability() do -- пока не обнаружена разница
         robot.place(3) -- установить блок
-        robot.swing(3) -- разрушить блок
+        swing(3) -- разрушить блок
     end
     status('записать результат')
     W_R = energy-robot.durability() -- записать результат
@@ -326,7 +332,7 @@ calibration = function() -- калибровка при запуске
     for s = 1, #sides do -- проверка всех направлений
         if robot.detect(3) or robot.place(3) then -- проверить наличие блока перед носом
             local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
-            robot.swing(3) -- сломать блок
+            swing(3) -- сломать блок
             local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
             for n = 2, 8, 2 do -- обойти смежные блоки в таблице
                 if math.ceil(B[n])-math.ceil(A[n])<0 then -- если блок исчез
@@ -363,8 +369,8 @@ inv_check = function() -- инвентаризация
 end
 
 sorter = function(pack) -- сортировка лута
-    robot.swing(0) -- освободить место для мусора
-    --robot.swing(1) -- освободить место для буфера
+    swing(0) -- освободить место для мусора
+    --swing(1) -- освободить место для буфера
     ------- сброс мусора -------
     local empty, available = 0, {} -- создать счетчик пустых слотов и доступных для упаковки
     for slot = 1, inventory do -- пройти по слотам инвентаря
