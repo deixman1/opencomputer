@@ -400,15 +400,20 @@ calibration = function() -- калибровка при запуске
     status('обнуление направления')
     D = nil -- обнуление направления
     status('проверка всех направлений')
-    if robot_detect(3) or robot.place(3) then -- проверить наличие блока перед носом
-        local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
-        broke(3) -- сломать блок
-        local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
-        for n = 2, 8, 2 do -- обойти смежные блоки в таблице
-            if math.ceil(B[n])-math.ceil(A[n])<0 then -- если блок исчез
-                D = sides[n/2] -- установить новое направление
-                break -- выйти из цикла
+    for s = 1, #sides do -- проверка всех направлений
+        if robot_detect(3) or robot.place(3) then -- проверить наличие блока перед носом
+            local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
+            broke(3) -- сломать блок
+            local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
+            for n = 2, 8, 2 do -- обойти смежные блоки в таблице
+                if math.ceil(B[n])-math.ceil(A[n])<0 then -- если блок исчез
+                    D = sides[n/2] -- установить новое направление
+                    break -- выйти из цикла
+                end
             end
+        else
+            status('поворот')
+            robot_turn() -- задействовать простой поворот
         end
     end
     if not D then
