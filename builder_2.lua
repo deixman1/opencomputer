@@ -348,6 +348,7 @@ pos = {x=0, y=0, z=0}
 pos_backup = {x=0, y=0, z=0}
 dir = 0
 dir_backup = 0
+side_home = 0
 
 function forward()
     while not robot.move(3) do
@@ -548,7 +549,7 @@ function recursion(y, w, l, circle, blockID, blockData) -- переход к н�
     return circle
 end
 
-file = io.open(filename, "r")
+file = io.open(filename, "rb")
  
 a = 0
 while (a ~= nil) do
@@ -605,8 +606,9 @@ end--]]
 io.read()
  
 print("Give the numbers of all slots containing the specified block type:")
- 
+
 slots={}
+block_list = {}
 for i,block in ipairs(uniqueblocks) do
     blockData = block.data
     --io.write(" -расположение в слоте "..slot_count.." предмета: " .. getBlockName(block.blockID,blockData) .. "? [y/n]")
@@ -618,6 +620,7 @@ for i,block in ipairs(uniqueblocks) do
     str = io.read()
     io.write("\n")
     if str == "y" then
+        block_list[#block_list+1] = {block.blockID,blockData}
         table.insert(slots[block.blockID][blockData], 1)
     end
 end
@@ -631,7 +634,7 @@ end
 
 turn()
 turn()
-local side_home = dir
+side_home = dir
 turn()
 turn()
 
@@ -640,14 +643,12 @@ forward()
 n = 1
 robot.select(n)
 
-for i,block in ipairs(slots) do
-    for i,v in ipairs(slots[block]) do
-        for y = 0, (height - 1) do
-            recursion(y, (width - 1), (length - 1), 0, block, v)
-        end
-        home()
-        robot.dropDown()
+for i,block in ipairs(block_list) do
+    for y = 0, (height - 1) do
+        recursion(y, (width - 1), (length - 1), 0, block[1], block[2])
     end
+    home()
+    robot.dropDown()
 end
 
 home()
