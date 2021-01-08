@@ -100,6 +100,7 @@ swing = function(side)
 		return robot.use(side, true)
 	else
 		return robot.swing(side)
+	end
 end
 
 check = function(forcibly) -- проверка инструмента, батареи, удаление меток
