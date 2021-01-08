@@ -247,7 +247,9 @@ step = function(side, ignore) -- функция движения на 1 блок
         --home(true, false) -- запустить завершающую функцию
         --report('insurmountable obstacle', true) -- послать сообщение
     else
-        broke(side) -- копать пока возможно
+    	if obstacle ~= 'air' then
+            broke(side) -- копать пока возможно
+        end
     end
     if robot_move(side) then -- если робот сдвинулся, обновить координаты
         steps = steps + 1 -- debug
