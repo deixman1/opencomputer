@@ -234,12 +234,12 @@ end
 
 step = function(side, ignore) -- функция движения на 1 блок
     computer.beep()
-    local result, obstacle = broke(side) 
-    if not result and obstacle ~= 'air' and robot_detect(side) then -- если блок нельзя разрушить
+    local result, obstacle = robot_detect(side) 
+    if not result and obstacle ~= 'air' then -- если блок нельзя разрушить
         status('неразрушаемый блок')
         while true do
             computer.beep()
-            os.sleep(3)
+            sleep(3)
             if broke(side) then
                 break
             end
