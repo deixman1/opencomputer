@@ -14,6 +14,8 @@ local function arr2a_arr(tbl) -- преобразование списка в а
     end
 end
 
+local side_energy_block = 0
+local side_chest = 0
 local tool_type_4810 = true
 local quads = {{-7, -7}, {-7, 1}, {1, -7}, {1, 1}}
 local workbench = {1,2,3,5,6,7,9,10,11}
@@ -408,6 +410,11 @@ calibration = function() -- калибровка при запуске
         status('калибровка не удалась', true)
         --report('calibration error', true)
     end
+    side_energy_block = D
+    robot_turn()
+    robot_turn()
+    side_chest = D
+    smart_turn(side_energy_block)
 end
 
 inv_check = function() -- инвентаризация
@@ -559,7 +566,6 @@ end
 
 home = function(forcibly, interrupt) -- переход к начальной точке и сброс лута
     ignore_check = true -- отключить проверку каждого шага
-    status('выгрузка руды')
     local x = X
     local y = Y
     local z = Z
@@ -570,7 +576,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
     status('прибыл домой')
     sorter() -- сортировка инвентаря
     status('ожидание выгрузки')
-    smart_turn(2)
+    smart_turn(side_chest)
     for slot = 1, inventory do -- обойти весь инвентарь
         local item = chest.getStackInInternalSlot(slot)
         if item then -- если слот не пуст
@@ -583,7 +589,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
             end
         end
     end
-    smart_turn(0)
+    smart_turn(side_energy_block)
     status('выгружено')
     if forcibly then
         if robot.durability() < 0.98 then
