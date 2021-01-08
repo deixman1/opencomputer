@@ -39,7 +39,8 @@ local crafting = add_component('crafting')
 local geolyzer = add_component('geolyzer')
 local tunnel = add_component('tunnel')
 local modem = add_component('modem')
-local robot = add_component('robot')
+--local component_robot = add_component('robot')
+local robot = require('robot')
 local inventory = robot.inventorySize()
 local energy_level, sleep, report, remove_point, check, step, turn, smart_turn, go, scan, calibration, sorter, home, main, solar, ignore_check, inv_check
 
@@ -95,11 +96,61 @@ remove_point = function(point) -- удаление меток
     table.remove(WORLD.z, point)
 end
 
-swing = function(side)
+robot_suck = function(side)
+    if side == 0 then
+        return robot.suckDown()
+    elseif side == 1 then
+        return robot.suckUp()
+    elseif side == 3 then
+        return robot.suck()
+    end
+end
+
+robot_drop = function(side)
+    if side == 0 then
+        return robot.dropDown()
+    elseif side == 1 then
+        return robot.dropUp()
+    elseif side == 3 then
+        return robot.drop()
+    end
+end
+
+robot_use = function(side)
+    if side == 0 then
+        return robot.useDown()
+    elseif side == 1 then
+        return robot.useUp()
+    elseif side == 3 then
+        return robot.use(3)
+    end
+end
+
+robot_swing = function(side)
+    if side == 0 then
+        return robot.swingDown()
+    elseif side == 1 then
+        return robot.swingUp()
+    elseif side == 3 then
+        return robot.swing(3)
+    end
+end
+
+broke = function(side)
     if tool_type_4810 then
-        return robot.use(side)
+        return robot_use(side)
     else
-        return robot.swing(side)
+        return robot_swing(side)
+    end
+end
+
+robot_detect = function(side)
+    if side == 0 then
+        return robot.detectDown()
+    elseif side == 1 then
+        return robot.detectUp()
+    elseif side == 3 then
+        return robot.detect()
     end
 end
 
@@ -154,14 +205,14 @@ check = function(forcibly) -- проверка инструмента, бата�
     if #WORLD.x ~= 0 then -- если таблица меток не пуста
         for i = 1, #WORLD.x do -- пройти по всем позициям
             if WORLD.y[i] == Y and ((WORLD.x[i] == X and ((WORLD.z[i] == Z+1 and D == 0) or (WORLD.z[i] == Z-1 and D == 2))) or (WORLD.z[i] == Z and ((WORLD.x[i] == X+1 and D == 3) or (WORLD.x[i] == X-1 and D == 1)))) then
-                swing(3)
+                broke(3)
                 remove_point(i)
             end
             if X == WORLD.x[i] and (Y-1 <= WORLD.y[i] and Y+1 >= WORLD.y[i]) and Z == WORLD.z[i] then
                 if WORLD.y[i] == Y+1 then -- добыть блок сверху, если есть
-                    swing(1)
+                    broke(1)
                 elseif WORLD.y[i] == Y-1 then -- добыть блок снизу
-                    swing(0)
+                    broke(0)
                 end
                 remove_point(i)
             end
@@ -169,24 +220,36 @@ check = function(forcibly) -- проверка инструмента, бата�
     end
 end
 
+robot_move = function(side)
+    if side == 0 then
+        return robot.down()
+    elseif side == 1 then
+        return robot.up()
+    elseif side == 2 then
+        return robot.back()
+    elseif side == 3 then
+        return robot.forward()
+    end
+end
+
 step = function(side, ignore) -- функция движения на 1 блок
-	computer.beep()
-    local result, obstacle = swing(side) 
-    if not result and obstacle ~= 'air' and robot.detect(side) then -- если блок нельзя разрушить
-    	status('неразрушаемый блок')
+    computer.beep()
+    local result, obstacle = broke(side) 
+    if not result and obstacle ~= 'air' and robot_detect(side) then -- если блок нельзя разрушить
+        status('неразрушаемый блок')
         while true do
             computer.beep()
             os.sleep(3)
-            if swing(side) then
-            	break
+            if broke(side) then
+                break
             end
         end
         --home(true, false) -- запустить завершающую функцию
         --report('insurmountable obstacle', true) -- послать сообщение
     else
-        swing(side) -- копать пока возможно
+        broke(side) -- копать пока возможно
     end
-    if robot.move(side) then -- если робот сдвинулся, обновить координаты
+    if robot_move(side) then -- если робот сдвинулся, обновить координаты
         steps = steps + 1 -- debug
         if side == 0 then
             Y = Y-1
@@ -209,22 +272,26 @@ step = function(side, ignore) -- функция движения на 1 блок
     end
 end
 
-turn = function(side) -- поворот в сторону
+robot_turn = function(side) -- поворот в сторону
     side = side or false
-    if robot.turn(side) and D then -- если робот повернулся, обновить переменную    направления
+    if side then
+        robot.turnRight()
+    else
+        robot.turnLeft()
+    end
+    if D then -- если робот повернулся, обновить переменную    направления
         turns = turns+1 -- debug
         if side then
             D = (D+1)%4
         else
             D = (D-1)%4
         end
-        check()
     end
 end
 
 smart_turn = function(side) -- поворот в определенную сторону света
     while D ~= side do
-        turn((side-D)%4==1)
+        robot_turn((side-D)%4==1)
     end
 end
 
@@ -281,7 +348,7 @@ calibration = function() -- калибровка при запуске
     elseif not geolyzer then -- проверить наличие геосканера
         status('геоанализатор не найден')
         --report('geolyzer not detected', true)
-    elseif not robot.detect(0) then
+    elseif not robot_detect(0) then
         status('снизу нет блока')
         --report('bottom solid block is not detected', true)
     elseif stat_tool then
@@ -321,7 +388,7 @@ calibration = function() -- калибровка при запуске
     --status('расчет расхода энергии за блок')
     --[[while energy == robot.durability() do -- пока не обнаружена разница
         robot.place(3) -- установить блок
-        swing(3) -- разрушить блок
+        broke(3) -- разрушить блок
     end--]]
     --status('записать результат')
     --W_R = energy-robot.durability() -- записать результат
@@ -331,9 +398,9 @@ calibration = function() -- калибровка при запуске
     D = nil -- обнуление направления
     status('проверка всех направлений')
     for s = 1, #sides do -- проверка всех направлений
-        if robot.detect(3) or robot.place(3) then -- проверить наличие блока перед носом
+        if robot_detect(3) or robot.place(3) then -- проверить наличие блока перед носом
             local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
-            swing(3) -- сломать блок
+            broke(3) -- сломать блок
             local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
             for n = 2, 8, 2 do -- обойти смежные блоки в таблице
                 if math.ceil(B[n])-math.ceil(A[n])<0 then -- если блок исчез
@@ -343,7 +410,7 @@ calibration = function() -- калибровка при запуске
             end
         else
             status('поворот')
-            turn() -- задействовать простой поворот
+            robot_turn() -- задействовать простой поворот
         end
     end
     if not D then
@@ -363,15 +430,15 @@ inv_check = function() -- инвентаризация
         end
     end
     if inventory-items < 10 or items/inventory > 0.9 then
-        robot.suck(1)
+        robot_suck(1)
         status('инвентарь заполнен')
         home(true, false)
     end
 end
 
 sorter = function(pack) -- сортировка лута
-    swing(0) -- освободить место для мусора
-    --swing(1) -- освободить место для буфера
+    broke(0) -- освободить место для мусора
+    --broke(1) -- освободить место для буфера
     ------- сброс мусора -------
     local empty, available = 0, {} -- создать счетчик пустых слотов и доступных для упаковки
     for slot = 1, inventory do -- пройти по слотам инвентаря
@@ -380,7 +447,7 @@ sorter = function(pack) -- сортировка лута
             local name = item.name:gsub('%g+:', '')
             if tails[name] then -- проверить на совпадение в списке отходов
                 robot.select(slot) -- выбрать слот
-                robot.drop(0) -- выбросить к отходам
+                robot_drop(0) -- выбросить к отходам
                 empty = empty + 1 -- обновить счетчик
             elseif fragments[name] then -- если есть совпадение в списке фрагментов
                 if available[name] then -- если уже создан счетчик
@@ -474,22 +541,22 @@ sorter = function(pack) -- сортировка лута
             end
         end
     end--]]
-    robot.suck(1) --- забрать предметы из буфера
+    robot_suck(1) --- забрать предметы из буфера
     inv_check()
 end
 
 local tool_charging = function()
-	smart_turn(0)
+    smart_turn(0)
     robot.select(1)
     chest.equip()
     local item = chest.getStackInInternalSlot(1)
     local now_charge = 0
     local max_charge = 1
     while not(now_charge == max_charge) do
-    	robot.drop(3)
+        robot_drop(3)
         status('ожидаю зарядки инструмента')
         sleep(30)
-        robot.suck(3)
+        robot_suck(3)
         item = chest.getStackInInternalSlot(1)
         if item then
             now_charge = item.charge
@@ -519,7 +586,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
             if not wlist[item.name] then -- если предмет не в белом списке
                 while item do
                     robot.select(slot) -- выбрать слот
-                    robot.drop(3)
+                    robot_drop(3)
                     item = chest.getStackInInternalSlot(slot)
                 end
             end
