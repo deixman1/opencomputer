@@ -385,7 +385,7 @@ calibration = function() -- калибровка при запуске
     D = nil -- обнуление направления
     status('проверка всех направлений')
     for s = 1, #sides do -- проверка всех направлений
-        if robot_detect[3]() or robot.place(3) then -- проверить наличие блока перед носом
+        if robot_detect[3]() then -- проверить наличие блока перед носом
             local A = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать первый скан
             broke[tool_type_4810](3) -- сломать блок
             local B = geolyzer.scan(-1, -1, 0, 3, 3, 1) -- сделать второй скан
