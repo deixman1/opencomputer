@@ -488,7 +488,7 @@ function main(y,x,z, blockID, blockData) -- переход к начальной
     blockID_cur = getBlockId(y,x,z)
     blockData_cur = getData(y,x,z)
     energy_level()
-    if blockID_cur ~= blockID or blockData_cur ~= blockData then 
+    if blockID_cur ~= blockID and blockData_cur ~= blockData then 
       --
     else
         slot_lst = slots[blockID][blockData]
@@ -527,22 +527,22 @@ function recursion(y, w, l, circle, blockID, blockData) -- переход к н�
     end
 
     for z = circle, l - 1 do
-        main(y, circle, z)
+        main(y, circle, z, blockID, blockData)
     end
 
     for x = circle, w - 1 do
-        main(y, x, l)
+        main(y, x, l, blockID, blockData)
     end
     
     for z = l, circle + 1, -1 do
-        main(y, w, z)
+        main(y, w, z, blockID, blockData)
     end
     
     for x = w, circle + 1, -1 do
-        main(y, x, circle)
+        main(y, x, circle, blockID, blockData)
     end
 
-    if recursion(y, w - 1, l - 1, circle + 1) == 0 then
+    if recursion(y, w - 1, l - 1, circle + 1, blockID, blockData) == 0 then
         return 0
     end
 
@@ -644,11 +644,14 @@ n = 1
 robot.select(n)
 
 for i,block in ipairs(block_list) do
+    print(block[1] .. " " .. block[2])
     for y = 0, (height - 1) do
         recursion(y, (width - 1), (length - 1), 0, block[1], block[2])
     end
     home()
-    robot.dropDown()
+    if robot.count(1) > 0 then
+        robot.dropDown()
+    end
 end
 
 home()
