@@ -472,12 +472,10 @@ end
 
 function refilling(slot, name)
     smart_turn(side_home)
-    robot.suck()
-    while robot.count(slot) > 0 do
+    while not robot.suck(3) do
         computer.beep()
         print('нет предмета в сундуке '..name)
         os.sleep(3)
-        robot.suck()
     end
 end
 
@@ -649,9 +647,7 @@ for i,block in ipairs(block_list) do
         recursion(y, (width - 1), (length - 1), 0, block[1], block[2])
     end
     home()
-    if robot.count(1) > 0 then
-        robot.dropDown()
-    end
+    robot.drop(0)
 end
 
 home()
