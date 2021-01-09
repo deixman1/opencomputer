@@ -552,7 +552,7 @@ sorter = function(pack) -- сортировка лута
 end
 
 local tool_charging = function()
-    smart_turn(0)
+    smart_turn(side_energy_block)
     robot.select(1)
     chest.equip()
     local item = chest.getStackInInternalSlot(1)
