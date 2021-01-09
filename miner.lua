@@ -1,7 +1,7 @@
 local component = require('component') -- подгрузить обертку из OpenOS
 local computer = require('computer')
 local chunks = 1 -- количество чанков для добычи
-local min, max = 1.6, 40 -- минимальная и максимальная плотность
+local min, max = 2.2, 40 -- минимальная и максимальная плотность
 local port = 10 -- порт для взаимодействия с роботом
 local X, Y, Z, D, border = 0, 0, 0, 0 -- переменные локальной системы координат
 local steps, turns = 0, 0 -- debug
@@ -243,30 +243,30 @@ check = function(forcibly) -- проверка инструмента, бата�
 end
 
 is_do_skip = {
-	["air"] = true,
-	["liquid"] = true,
+    ["air"] = true,
+    ["liquid"] = true,
 }
 
 do_broke = {
-	[true] = {
-		[true] = function(side) return false end,
-		[false] = function(side) broke[tool_type_4810](side) end,
-	},
-	[false] = {
-		[true] = function(side) return false end,
-		[false] = function(side)
-		    while not broke[tool_type_4810](side) do
-		    	status('неразрушаемый блок')
+    [true] = {
+        [true] = function(side) return false end,
+        [false] = function(side) broke[tool_type_4810](side) end,
+    },
+    [false] = {
+        [true] = function(side) return false end,
+        [false] = function(side)
+            while not broke[tool_type_4810](side) do
+                status('неразрушаемый блок')
                 computer.beep()
                 sleep(3)
             end
         end,
-	},
+    },
 }
 
 step = function(side, ignore) -- функция движения на 1 блок
     local result, obstacle = robot_detect[side]()
-	local skip = is_do_skip[obstacle] or false
+    local skip = is_do_skip[obstacle] or false
     do_broke[result][skip](side)
     if robot_move[side]() then -- если робот сдвинулся, обновить координаты
         steps = steps + 1 -- debug
