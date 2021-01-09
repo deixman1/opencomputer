@@ -268,8 +268,8 @@ step = function(side, ignore) -- функция движения на 1 блок
     local result, obstacle = robot_detect[side]()
     --local skip = is_do_skip[obstacle] or false
     if result then
-    	broke[tool_type_4810](side)
-	end
+        broke[tool_type_4810](side)
+    end
     if robot_move[side]() then -- если робот сдвинулся, обновить координаты
         steps = steps + 1 -- debug
         if side == 0 then
