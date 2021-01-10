@@ -482,11 +482,6 @@ function refilling(slot, name)
     end
 end
 
-function save_progress()
-    local file = io.open("lastpoint", "w")
-
-end
-
 function main(y,x,z, blockID, blockData) -- переход к начальной точке и сброс лута
     blockID_cur = getBlockId(y,x,z)
     blockData_cur = getData(y,x,z)
@@ -551,9 +546,6 @@ function recursion(y, w, l, circle, blockID, blockData) -- переход к н�
 
     return circle
 end
-
-if filename ~= "lastpoint" then
-file = io.open(filename, "rb")
  
 a = 0
 while (a ~= nil) do
