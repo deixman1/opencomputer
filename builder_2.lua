@@ -14,9 +14,9 @@ local computer = require("computer")
 local chest = add_component('inventory_controller')
 local args = {...}
 
-if #args ~= 1 then
+if #args == 0 then
     print("Usage: build <filename>")
-    return
+    os.exit()
 end
  
 local filename = shell.resolve(args[1])
@@ -53,7 +53,7 @@ block_id[13] = "гравий 13"
 block_id[14] = "золотая руда 14"
 block_id[15] = "железная руда 15"
 block_id[16] = "угольная руда 16"
-block_id[17] = "журнал 17"
+block_id[17] = "дуб 17"
 block_id[18] = "оставляет 18"
 block_id[19] = "губка 19"
 block_id[20] = "стакан 20"
@@ -477,12 +477,17 @@ function refilling(slot, name)
         print('нет предмета в сундуке '..name)
         os.sleep(3)
     end
+    if robot.count(2) == 0 then
+        robot.transferTo(2,1)
+    end
+end
+
+function save_progress()
+    local file = io.open("lastpoint", "w")
+
 end
 
 function main(y,x,z, blockID, blockData) -- переход к начальной точке и сброс лута
-    local file = io.open("logs.txt", "a")
-    file:write("\nX: "..pos.x..", Y: "..pos.y..", Z: "..pos.z)
-    file:close()
     blockID_cur = getBlockId(y,x,z)
     blockData_cur = getData(y,x,z)
     energy_level()
@@ -547,6 +552,7 @@ function recursion(y, w, l, circle, blockID, blockData) -- переход к н�
     return circle
 end
 
+if filename ~= "lastpoint" then
 file = io.open(filename, "rb")
  
 a = 0
@@ -642,12 +648,16 @@ n = 1
 robot.select(n)
 
 for i,block in ipairs(block_list) do
-    print(block[1] .. " " .. block[2])
+    local lastblock
     for y = 0, (height - 1) do
         recursion(y, (width - 1), (length - 1), 0, block[1], block[2])
+        lastblock = block[2]
     end
     home()
     robot.drop(0)
+    robot.select(2)
+    robot.drop(0)
+    robot.select(1)
 end
 
 home()
