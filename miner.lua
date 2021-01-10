@@ -51,10 +51,11 @@ energy_level = function()
 end
 
 sleep = function(timeout)
-    local deadline = computer.uptime()+timeout
+	os.sleep(timeout)
+    --[[local deadline = computer.uptime()+timeout
     repeat
         computer.pullSignal(deadline-computer.uptime())
-    until computer.uptime() >= deadline
+    until computer.uptime() >= deadline--]]
 end
 
 --[[report = function(message, stop) -- рапорт о состоянии
@@ -76,7 +77,7 @@ end
 end--]]
 
 local status = function(message, stop) -- рапорт о состоянии
-    message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
+--[[    message = '|'..X..' '..Y..' '..Z..'|\n'..message..'\nenergy level: '..math.floor(energy_level()*100)..'%' -- добавить к сообщению координаты и уровень энергии
     os.execute("clear")
     local file = io.open("logs.txt", "a")
     file:write(message)
@@ -89,7 +90,7 @@ local status = function(message, stop) -- рапорт о состоянии
         end
         --error(message, 0) -- остановить работу программы
         os.exit()
-    end
+    end--]]
 end
 
 remove_point = function(point) -- удаление меток
@@ -150,7 +151,7 @@ robot_turn = function(side) -- поворот в сторону
     side = side or false
     robot_turn_side[side]()
     if D then -- если робот повернулся, обновить переменную    направления
-        turns = turns+1 -- debug
+        --turns = turns+1 -- debug
         if side then
             D = (D+1)%4
         else
@@ -161,6 +162,7 @@ end
 
 smart_turn = function(side) -- поворот в определенную сторону света
     while D ~= side do
+    	os.sleep(0)
         robot_turn((side-D)%4==1)
     end
 end
@@ -271,7 +273,7 @@ step = function(side, ignore) -- функция движения на 1 блок
         broke[tool_type_4810](side)
     end
     if robot_move[side]() then -- если робот сдвинулся, обновить координаты
-        steps = steps + 1 -- debug
+        --steps = steps + 1 -- debug
         if side == 0 then
             Y = Y-1
         elseif side == 1 then
@@ -298,6 +300,7 @@ go = function(x, y, z) -- переход по указанным координ�
         y = border
     end
     while Y ~= y do
+    	os.sleep(0)
         if Y < y then
             step(1)
         elseif Y > y then
@@ -310,6 +313,7 @@ go = function(x, y, z) -- переход по указанным координ�
         smart_turn(1)
     end
     while X ~= x do
+    	os.sleep(0)
         step(3)
     end
     if Z < z then
@@ -318,6 +322,7 @@ go = function(x, y, z) -- переход по указанным координ�
         smart_turn(2)
     end
     while Z ~= z do
+    	os.sleep(0)
         step(3)
     end
 end
@@ -561,6 +566,7 @@ local tool_charging = function()
     local now_charge = 0
     local max_charge = 1
     while not(now_charge == max_charge) do
+    	os.sleep(0)
         robot_drop[3]()
         status('ожидаю зарядки инструмента')
         sleep(30)
@@ -592,6 +598,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
         if item then -- если слот не пуст
             if not wlist[item.name] then -- если предмет не в белом списке
                 while item do
+                	os.sleep(0)
                     robot.select(slot) -- выбрать слот
                     robot_drop[3]()
                     item = chest.getStackInInternalSlot(slot)
@@ -609,6 +616,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
         end
     end
     while energy_level() < 0.98 do -- ждать полного заряда батареи
+    	os.sleep(0)
         status('заряжаюсь')
         sleep(30)
     end
@@ -625,6 +633,7 @@ end
 main = function()
     border = nil
     while not border do
+    	os.sleep(0)
         step(0)
         for q = 1, 4 do
             scan(table.unpack(quads[q]))
@@ -662,7 +671,7 @@ end
 
 calibration() -- запустить калибровку
 calibration = nil -- освободить память от функции калибровки
-local Tau = computer.uptime() -- записать текущее время
+--local Tau = computer.uptime() -- записать текущее время
 local pos = {0, 0, 0, [0] = 1} -- таблица для хранения координат чанков
 for o = 1, 10 do -- цикл ограничения спирали
     for i = 1, 2 do -- цикл обновления координат
@@ -673,7 +682,7 @@ for o = 1, 10 do -- цикл ограничения спирали
             pos[i], pos[3] = pos[i] + pos[0], pos[3] + 1 -- обновить координаты
             if pos[3] == chunks then -- если достигнут последний чанк
                 home(true, true) -- возврат домой
-                status(computer.uptime()-Tau..' секунд\nдлина пути: '..steps..'\nсделано поворотов: '..turns, true) 
+                status(' секунд\nдлина пути: '..steps..'\nсделано поворотов: '..turns, true) 
                 --report(computer.uptime()-Tau..' seconds\npath length: '..steps..'\nmade turns: '..turns, true) -- сообщить о завершении работы
             else -- иначе
                 WORLD = {x = {}, y = {}, z = {}} 
