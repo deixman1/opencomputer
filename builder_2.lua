@@ -485,6 +485,7 @@ end
 function main(y,x,z, blockID, blockData) -- переход к начальной точке и сброс лута
     blockID_cur = getBlockId(y,x,z)
     blockData_cur = getData(y,x,z)
+    print(blockID_cur .. " " .. blockID .. blockID_cur ~= blockID .. " - " .. blockData_cur .. " " .. blockData .. " " .. blockData_cur ~= blockData)
     energy_level()
     if blockID_cur ~= blockID and blockData_cur ~= blockData then 
       --
@@ -546,7 +547,8 @@ function recursion(y, w, l, circle, blockID, blockData) -- переход к н�
 
     return circle
 end
- 
+
+local file = io.open(filename, "rb")
 a = 0
 while (a ~= nil) do
     a = file:read(1)
