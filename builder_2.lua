@@ -485,11 +485,10 @@ end
 function main(y,x,z, blockID, blockData) -- переход к начальной точке и сброс лута
     blockID_cur = getBlockId(y,x,z)
     blockData_cur = getData(y,x,z)
-    print(blockID_cur .. " " .. blockID .. blockID_cur ~= blockID .. " - " .. blockData_cur .. " " .. blockData .. " " .. blockData_cur ~= blockData)
     energy_level()
-    if blockID_cur ~= blockID and blockData_cur ~= blockData then 
-      --
-    else
+    if (blockID_cur == blockID) and (blockData_cur == blockData) then 
+        print(blockID_cur .. " " .. blockID)
+        print(blockData_cur .. " " .. blockData)
         slot_lst = slots[blockID][blockData]
         if(slot_lst ~= nil) then
             if(#slot_lst > 0) then
