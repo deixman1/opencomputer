@@ -8,16 +8,18 @@ function add_component(name) -- получение прокси компонен
 end
 local chest = add_component('inventory_controller')
 
-height = 70
-width = 8+8+8
-length = 8+8+8
-border = 5
-shit = height % 3
-pos = {x=0, y=0, z=0}
-pos_backup = {x=0, y=0, z=0}
-dir = 0
-dir_backup = 0
-side_home = 0
+local height = 70-1
+local inner_begin_pos = 2
+local width = (8+8+8-inner_begin_pos)-1
+local length = (8+8+8-inner_begin_pos)-1
+local border = 5-1
+local way = height-border
+local shit = way % 2
+local pos = {x=0, y=0, z=0}
+local pos_backup = {x=0, y=0, z=0}
+local dir = 0
+local dir_backup = 0
+local side_home = dir
 
 function recursion(h, w, l, circle) -- переход к начальной точке и сброс лута
     os.sleep(0)
@@ -41,11 +43,19 @@ function recursion(h, w, l, circle) -- переход к начальной то
         go(h, x, circle)
     end
 
-    if recursion(h, w - 3, l - 3, circle + 1) == 0 then
+    if recursion(h, w - 2, l - 2, circle + 2) == 0 then
         return 0
     end
 
     return circle
+    -- 1 2 3 4 1 2 3 4
+    -- 1 2 3 4 1 2 3 4
+    -- 1 2 3 4 1 2 3 4
+    -- 1 2 3 4 1 2 3 4
+    -- 1 2 3 4 1 2 3 4
+    -- 1 2 3 4 1 2 3 4
+    -- 1 2 3 4 1 2 3 4
+    -- 1 2 3 4 1 2 3 4
 end
 
 function forward()
@@ -189,12 +199,12 @@ function energy_level()
     end
 end
 
-for y = height-1, border, -3 do
-	recursion(y, (width - 1), (length - 1), 0)
+for y = 0, -way, -2 do
+	recursion(y, width, length, 0)
 end
 
-if (height - shit) ~= height then
-	recursion(-border, (width - 1), (length - 1), 0)
+if shit ~= 0 then
+	recursion(-height, width, length, 0)
 end
 
 home()
