@@ -41,7 +41,7 @@ function recursion(h, w, l, circle) -- переход к начальной то
         go(h, x, circle)
     end
 
-    if recursion(h, w - 3, l - 3, circle + 3) == 0 then
+    if recursion(h, w - 3, l - 3, circle + 1) == 0 then
         return 0
     end
 
