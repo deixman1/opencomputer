@@ -27,27 +27,26 @@ local position_at_home = false
 
 function recursion(h, w, l, circle) -- переход к начальной точке и сброс лута
     os.sleep(0)
-    robot_check()
     if circle > w or circle > l then
         return 0
     end
-
+    robot_check()
     for z = circle, l - 1 do
-    	go(h, circle, z)
+        go(h, circle, z)
     end
-
+    robot_check()
     for x = circle, w - 1 do
         go(h, x, l)
     end
-    
+    robot_check()
     for z = l, circle + 1, -1 do
         go(h, w, z)
     end
-    
+    robot_check()
     for x = w, circle + 1, -1 do
         go(h, x, circle)
     end
-
+    robot_check()
     if recursion(h, w - 2, l - 2, circle + 2) == 0 then
         return 0
     end
@@ -175,55 +174,55 @@ function robot_check()
         status('пробуем зарядить инструмент')
         home()
         smart_turn(side_home)
-	    robot.select(1)
-	    chest.equip()
-	    local item = chest.getStackInInternalSlot(1)
-	    local now_charge = 0
-	    local max_charge = 1
-	    while not(now_charge == max_charge) do
-	        robot.drop()
-	        status('ожидаю зарядки инструмента')
-	        os.sleep(10)
-	        robot.suck()
-	        item = chest.getStackInInternalSlot(1)
-	        if item then
-	            now_charge = item.charge
-	            max_charge = item.maxCharge
-	        end
-	    end
-	    chest.equip()
+        robot.select(1)
+        chest.equip()
+        local item = chest.getStackInInternalSlot(1)
+        local now_charge = 0
+        local max_charge = 1
+        while not(now_charge == max_charge) do
+            robot.drop()
+            status('ожидаю зарядки инструмента')
+            os.sleep(10)
+            robot.suck()
+            item = chest.getStackInInternalSlot(1)
+            if item then
+                now_charge = item.charge
+                max_charge = item.maxCharge
+            end
+        end
+        chest.equip()
         status('инструмент заряжен')
     end
     local fill = 0
     for slot = 1, inventory do 
-    	local item = chest.getStackInInternalSlot(slot)
-    	if item then
-    		fill = fill + 1
-    	end
+        local item = chest.getStackInInternalSlot(slot)
+        if item then
+            fill = fill + 1
+        end
     end
     if (inventory-fill) < 10 then
-    	home()
-    	smart_turn(side_chest)
-    	for slot = 1, inventory do 
-    		local item = chest.getStackInInternalSlot(slot)
-	    	if item then
-	    		robot.select(slot)
-	    		robot.drop()
-	    	end
-    	end
-    	robot.select(1)
+        home()
+        smart_turn(side_chest)
+        for slot = 1, inventory do 
+            local item = chest.getStackInInternalSlot(slot)
+            if item then
+                robot.select(slot)
+                robot.drop()
+            end
+        end
+        robot.select(1)
     end
     if position_at_home then
-    	return_to_work()
-	end
+        return_to_work()
+    end
 end
 
 for y = 0, -way, -2 do
-	recursion(y, width, length, 0)
+    recursion(y, width, length, 0)
 end
 
 if shit ~= 0 then
-	recursion(-height, width, length, 0)
+    recursion(-height, width, length, 0)
 end
 
 home()
