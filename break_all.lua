@@ -10,8 +10,8 @@ local chest = add_component('inventory_controller')
 
 local height = 70-1
 local inner_begin_pos = 2
-local width = (8+8+8-inner_begin_pos)-1
-local length = (8+8+8-inner_begin_pos)-1
+local width = (16+16+16-inner_begin_pos)-1
+local length = (16+16+16-inner_begin_pos)-1
 local border = 5-1
 local way = height-border
 local shit = way % 2
@@ -23,6 +23,7 @@ local side_home = dir
 
 function recursion(h, w, l, circle) -- переход к начальной точке и сброс лута
     os.sleep(0)
+    energy_level()
     if circle > w or circle > l then
         return 0
     end
@@ -48,14 +49,6 @@ function recursion(h, w, l, circle) -- переход к начальной то
     end
 
     return circle
-    -- 1 2 3 4 1 2 3 4
-    -- 1 2 3 4 1 2 3 4
-    -- 1 2 3 4 1 2 3 4
-    -- 1 2 3 4 1 2 3 4
-    -- 1 2 3 4 1 2 3 4
-    -- 1 2 3 4 1 2 3 4
-    -- 1 2 3 4 1 2 3 4
-    -- 1 2 3 4 1 2 3 4
 end
 
 function forward()
@@ -112,7 +105,7 @@ function smart_turn(side) -- поворот в определенную стор
     end
 end
 
-function go(x, y, z) -- переход по указанным координатам
+function go(y, x, z) -- переход по указанным координатам
     while pos.y ~= y do
         os.sleep(0)
         if pos.y < y then
@@ -147,7 +140,7 @@ function home() -- переход к начальной точке и сброс
     pos_backup.z = pos.z
     dir_backup = dir
     print('отправляюсь домой')
-    go(0, pos.y+2, 0)
+    go(0, pos.y-2, 0)
     go(0, 0, 0)
     smart_turn(side_home)
     print('прибыл домой')
@@ -156,7 +149,7 @@ end
 
 function return_to_work() -- переход к начальной точке и сброс лута
     print('возврат к работе')
-    go(pos_backup.x, pos_backup.y+2, pos_backup.z)
+    go(pos_backup.x, pos_backup.y-2, pos_backup.z)
     go(pos_backup.x, pos_backup.y, pos_backup.z)
     smart_turn(dir_backup)
     print('прибыл на работу')
