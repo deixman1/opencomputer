@@ -8,6 +8,17 @@ function add_component(name) -- получение прокси компонен
 end
 local chest = add_component('inventory_controller')
 
+height = 70
+width = 8+8+8
+length = 8+8+8
+border = 5
+shit = height % 3
+pos = {x=0, y=0, z=0}
+pos_backup = {x=0, y=0, z=0}
+dir = 0
+dir_backup = 0
+side_home = 0
+
 function recursion(h, w, l, circle) -- переход к начальной точке и сброс лута
     os.sleep(0)
     if circle > w or circle > l then
@@ -38,7 +49,7 @@ function recursion(h, w, l, circle) -- переход к начальной то
 end
 
 function forward()
-    while not robot.move(3) do
+    while not robot.forward() do
         os.sleep(0)
         robot.swing(3)
     end
@@ -177,17 +188,6 @@ function energy_level()
         status('инструмент заряжен')
     end
 end
-
-height = 70
-width = 8
-length = 8
-border = 5
-shit = y % 3
-pos = {x=0, y=0, z=0}
-pos_backup = {x=0, y=0, z=0}
-dir = 0
-dir_backup = 0
-side_home = 0
 
 for y = height-1, border, -3 do
 	recursion(y, (width - 1), (length - 1), 0)
