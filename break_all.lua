@@ -1,5 +1,6 @@
 local component = require('component')
 local robot = require("robot")
+local computer = require("computer")
 function add_component(name) -- получение прокси компонента
     name = component.list(name)() -- получить адрес по имени
     if name then -- если есть адрес
@@ -8,6 +9,7 @@ function add_component(name) -- получение прокси компонен
 end
 local chest = add_component('inventory_controller')
 
+local inventory = robot.inventorySize()
 local height = 70-1
 local inner_begin_pos = 2
 local width = (16+16+16-inner_begin_pos)-1
@@ -19,11 +21,13 @@ local pos = {x=0, y=0, z=0}
 local pos_backup = {x=0, y=0, z=0}
 local dir = 0
 local dir_backup = 0
-local side_home = dir
+local side_home = 2
+local side_chest = 1
+local position_at_home = false
 
 function recursion(h, w, l, circle) -- переход к начальной точке и сброс лута
     os.sleep(0)
-    energy_level()
+    robot_check()
     if circle > w or circle > l then
         return 0
     end
@@ -142,7 +146,6 @@ function home() -- переход к начальной точке и сброс
     print('отправляюсь домой')
     go(0, pos.y-2, 0)
     go(0, 0, 0)
-    smart_turn(side_home)
     print('прибыл домой')
     position_at_home = true
 end
@@ -156,21 +159,22 @@ function return_to_work() -- переход к начальной точке и 
     position_at_home = false
 end
 
-function energy_level()
+function robot_check()
     local energy = computer.energy()/computer.maxEnergy()
     if energy < 0.1 then
         home()
+        smart_turn(side_home)
         while energy < 0.98 do
             print("Низкий заряд. Жду зарядки")
             computer.beep()
             os.sleep(3)
             energy = computer.energy()/computer.maxEnergy()
         end
-        return_to_work()
     end
     if robot.durability() < 0.3 then
         status('пробуем зарядить инструмент')
         home()
+        smart_turn(side_home)
 	    robot.select(1)
 	    chest.equip()
 	    local item = chest.getStackInInternalSlot(1)
@@ -190,6 +194,28 @@ function energy_level()
 	    chest.equip()
         status('инструмент заряжен')
     end
+    local fill = 0
+    for slot = 1, inventory do 
+    	local item = chest.getStackInInternalSlot(slot)
+    	if item then
+    		fill = fill + 1
+    	end
+    end
+    if (inventory-fill) < 10 then
+    	home()
+    	smart_turn(side_chest)
+    	for slot = 1, inventory do 
+    		local item = chest.getStackInInternalSlot(slot)
+	    	if item then
+	    		robot.select(slot)
+	    		robot.drop()
+	    	end
+    	end
+    	robot.select(1)
+    end
+    if position_at_home then
+    	return_to_work()
+	end
 end
 
 for y = 0, -way, -2 do
