@@ -171,7 +171,7 @@ function robot_check()
         end
     end
     if robot.durability() < 0.3 then
-        status('пробуем зарядить инструмент')
+        print('пробуем зарядить инструмент')
         home()
         smart_turn(side_home)
         robot.select(1)
@@ -181,7 +181,7 @@ function robot_check()
         local max_charge = 1
         while not(now_charge == max_charge) do
             robot.drop()
-            status('ожидаю зарядки инструмента')
+            print('ожидаю зарядки инструмента')
             os.sleep(10)
             robot.suck()
             item = chest.getStackInInternalSlot(1)
@@ -191,7 +191,7 @@ function robot_check()
             end
         end
         chest.equip()
-        status('инструмент заряжен')
+        print('инструмент заряжен')
     end
     local fill = 0
     for slot = 1, inventory do 
