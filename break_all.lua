@@ -47,7 +47,7 @@ function recursion(h, w, l, circle) -- переход к начальной то
         go(h, x, circle)
     end
     robot_check()
-    if recursion(h, w - 2, l - 2, circle + 2) == 0 then
+    if recursion(h, w - 3, l - 3, circle + 3) == 0 then
         return 0
     end
 
@@ -57,7 +57,7 @@ end
 function forward()
     while not robot.forward() do
         os.sleep(0)
-        robot.swing(3)
+        robot.swing()
     end
     
     if dir == 0 then pos.x = pos.x+1
@@ -69,14 +69,14 @@ end
 function up()
     while not robot.up() do
         os.sleep(0)
-        robot.swing(1)
+        robot.swingUp()
     end
     pos.y = pos.y+1
 end
 function down()
     while not robot.down() do
         os.sleep(0)
-        robot.swing(0)
+        robot.swingDown()
     end
     pos.y = pos.y-1
 end
@@ -217,7 +217,7 @@ function robot_check()
     end
 end
 
-for y = 0, -way, -2 do
+for y = 0, -way, -3 do
     recursion(y, width, length, 0)
 end
 
