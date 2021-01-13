@@ -143,7 +143,6 @@ function home() -- переход к начальной точке и сброс
     pos_backup.z = pos.z
     dir_backup = dir
     print('отправляюсь домой')
-    go(pos.y-2, 0, 0)
     go(0, 0, 0)
     print('прибыл домой')
     position_at_home = true
@@ -151,7 +150,6 @@ end
 
 function return_to_work() -- переход к начальной точке и сброс лута
     print('возврат к работе')
-    go(pos_backup.y-2, pos_backup.x, pos_backup.z)
     go(pos_backup.y, pos_backup.x, pos_backup.z)
     smart_turn(dir_backup)
     print('прибыл на работу')
