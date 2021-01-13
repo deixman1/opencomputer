@@ -24,6 +24,7 @@ local dir_backup = 0
 local side_home = 2
 local side_chest = 1
 local position_at_home = false
+local need_swing = true
 
 function recursion(h, w, l, circle) -- переход к начальной точке и сброс лута
     os.sleep(0)
@@ -113,10 +114,14 @@ function go(y, x, z) -- переход по указанным координа�
         os.sleep(0)
         if pos.y < y then
             up()
-            robot.swing()
+            if need_swing then
+            	robot.swing()
+            end
         elseif pos.y > y then
             down()
-            robot.swing()
+            if need_swing then
+            	robot.swing()
+            end
         end
     end
     if pos.x < x then
@@ -127,7 +132,9 @@ function go(y, x, z) -- переход по указанным координа�
     while pos.x ~= x do
         os.sleep(0)
         forward()
-        robot.swing()
+        if need_swing then
+            robot.swing()
+        end
     end
     if pos.z < z then
         smart_turn(3)
@@ -137,7 +144,9 @@ function go(y, x, z) -- переход по указанным координа�
     while pos.z ~= z do
         os.sleep(0)
         forward()
-        robot.swing()
+        if need_swing then
+            robot.swing()
+        end
     end
 end
 
@@ -146,6 +155,7 @@ function home() -- переход к начальной точке и сброс
     pos_backup.y = pos.y
     pos_backup.z = pos.z
     dir_backup = dir
+    need_swing = false
     print('отправляюсь домой')
     go(0, 0, 0)
     print('прибыл домой')
@@ -158,6 +168,7 @@ function return_to_work() -- переход к начальной точке и 
     smart_turn(dir_backup)
     print('прибыл на работу')
     position_at_home = false
+    need_swing = true
 end
 
 function robot_check()
