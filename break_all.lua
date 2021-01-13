@@ -34,22 +34,18 @@ function recursion(h, w, l, circle) -- переход к начальной то
     for z = circle, l - 1 do
         go(h, circle, z)
     end
-    robot.swing()
     robot_check()
     for x = circle, w - 1 do
         go(h, x, l)
     end
-    robot.swing()
     robot_check()
     for z = l, circle + 1, -1 do
         go(h, w, z)
     end
-    robot.swing()
     robot_check()
     for x = w, circle + 1, -1 do
         go(h, x, circle)
     end
-    robot.swing()
     robot_check()
     if recursion(h, w - 3, l - 3, circle + 3) == 0 then
         return 0
@@ -117,8 +113,10 @@ function go(y, x, z) -- переход по указанным координа�
         os.sleep(0)
         if pos.y < y then
             up()
+            robot.swing()
         elseif pos.y > y then
             down()
+            robot.swing()
         end
     end
     if pos.x < x then
@@ -129,6 +127,7 @@ function go(y, x, z) -- переход по указанным координа�
     while pos.x ~= x do
         os.sleep(0)
         forward()
+        robot.swing()
     end
     if pos.z < z then
         smart_turn(3)
@@ -138,6 +137,7 @@ function go(y, x, z) -- переход по указанным координа�
     while pos.z ~= z do
         os.sleep(0)
         forward()
+        robot.swing()
     end
 end
 
