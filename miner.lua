@@ -162,7 +162,7 @@ end
 
 smart_turn = function(side) -- поворот в определенную сторону света
     while D ~= side do
-    	os.sleep(0)
+    	os.sleep()
         robot_turn((side-D)%4==1)
     end
 end
@@ -300,7 +300,7 @@ go = function(x, y, z) -- переход по указанным координ�
         y = border
     end
     while Y ~= y do
-    	os.sleep(0)
+    	os.sleep()
         if Y < y then
             step(1)
         elseif Y > y then
@@ -313,7 +313,7 @@ go = function(x, y, z) -- переход по указанным координ�
         smart_turn(1)
     end
     while X ~= x do
-    	os.sleep(0)
+    	os.sleep()
         step(3)
     end
     if Z < z then
@@ -322,7 +322,7 @@ go = function(x, y, z) -- переход по указанным координ�
         smart_turn(2)
     end
     while Z ~= z do
-    	os.sleep(0)
+    	os.sleep()
         step(3)
     end
 end
@@ -566,7 +566,7 @@ local tool_charging = function()
     local now_charge = 0
     local max_charge = 1
     while not(now_charge == max_charge) do
-    	os.sleep(0)
+    	os.sleep()
         robot_drop[3]()
         status('ожидаю зарядки инструмента')
         sleep(30)
@@ -598,7 +598,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
         if item then -- если слот не пуст
             if not wlist[item.name] then -- если предмет не в белом списке
                 while item do
-                	os.sleep(0)
+                	os.sleep()
                     robot.select(slot) -- выбрать слот
                     robot_drop[3]()
                     item = chest.getStackInInternalSlot(slot)
@@ -616,7 +616,7 @@ home = function(forcibly, interrupt) -- переход к начальной т�
         end
     end
     while energy_level() < 0.98 do -- ждать полного заряда батареи
-    	os.sleep(0)
+    	os.sleep()
         status('заряжаюсь')
         sleep(30)
     end
@@ -633,14 +633,14 @@ end
 main = function()
     border = nil
     while not border do
-    	os.sleep(0)
+    	os.sleep()
         step(0)
         for q = 1, 4 do
             scan(table.unpack(quads[q]))
         end
     end
     while #WORLD.x ~= 0 do
-        os.sleep(0)
+        os.sleep()
         local n_delta, c_delta, current = math.huge, math.huge
         for index = 1, #WORLD.x do
             n_delta = math.abs(X-WORLD.x[index])+math.abs(Y-WORLD.y[index])+math.abs(Z-WORLD.z[index])-border+WORLD.y[index]
