@@ -272,6 +272,7 @@ function readname(file)
 end
  
 function parse(a, file, containsName)
+    os.sleep()
     if containsName == nil then containsName = true end
     --print(a)
     if a==0 then
@@ -352,6 +353,7 @@ side_home = 0
 
 function forward()
     while not robot.move(3) do
+        os.sleep()
         robot.swing(3)
     end
     
@@ -363,12 +365,14 @@ function forward()
 end
 function up()
     while not robot.move(1) do
+        os.sleep()
         robot.swing(1)
     end
     pos.y = pos.y+1
 end
 function down()
     while not robot.move(0) do
+        os.sleep()
         robot.swing(0)
     end
     pos.y = pos.y-1
@@ -390,6 +394,7 @@ end
 
 function place()
     while not robot.place(0) do
+        os.sleep()
         robot.swing(0)
     end
 end
@@ -418,12 +423,14 @@ end
 
 function smart_turn(side) -- поворот в определенную сторону света
     while dir ~= side do
+        os.sleep()
         turn((side-dir)%4==1)
     end
 end
 
 function go(x, y, z) -- переход по указанным координатам
     while pos.y ~= y do
+        os.sleep()
         if pos.y < y then
             up()
         elseif pos.y > y then
@@ -436,6 +443,7 @@ function go(x, y, z) -- переход по указанным координа�
         smart_turn(2)
     end
     while pos.x ~= x do
+        os.sleep()
         forward()
     end
     if pos.z < z then
@@ -444,6 +452,7 @@ function go(x, y, z) -- переход по указанным координа�
         smart_turn(1)
     end
     while pos.z ~= z do
+        os.sleep()
         forward()
     end
 end
@@ -520,6 +529,7 @@ function main(y,x,z, blockID, blockData) -- переход к начальной
 end
 
 function recursion(y, w, l, circle, blockID, blockData) -- переход к начальной точке и сброс лута
+    os.sleep()
     if circle > w or circle > l then
         return 0
     end
@@ -550,6 +560,7 @@ end
 local file = io.open(filename, "rb")
 a = 0
 while (a ~= nil) do
+    os.sleep()
     a = file:read(1)
     if a == nil then break end
     a = string.byte(a)
@@ -656,3 +667,5 @@ end
 home()
 
 print('работа выполнена')
+
+robot.turnAround()
