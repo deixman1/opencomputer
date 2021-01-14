@@ -27,7 +27,7 @@ local position_at_home = false
 local need_swing = true
 
 function recursion(h, w, l, circle) -- переход к начальной точке и сброс лута
-    os.sleep(0)
+    os.sleep()
     if circle > w or circle > l then
         return 0
     end
@@ -57,7 +57,7 @@ end
 
 function forward()
     while not robot.forward() do
-        os.sleep(0)
+        os.sleep()
         robot.swing()
     end
     
@@ -69,14 +69,14 @@ function forward()
 end
 function up()
     while not robot.up() do
-        os.sleep(0)
+        os.sleep()
         robot.swingUp()
     end
     pos.y = pos.y+1
 end
 function down()
     while not robot.down() do
-        os.sleep(0)
+        os.sleep()
         robot.swingDown()
     end
     pos.y = pos.y-1
@@ -104,14 +104,14 @@ function turn(side) -- поворот в сторону
 end
 function smart_turn(side) -- поворот в определенную сторону света
     while dir ~= side do
-        os.sleep(0)
+        os.sleep()
         turn((side-dir)%4==1)
     end
 end
 
 function go(y, x, z) -- переход по указанным координатам
     while pos.y ~= y do
-        os.sleep(0)
+        os.sleep()
         if pos.y < y then
             up()
             if need_swing then
@@ -130,7 +130,7 @@ function go(y, x, z) -- переход по указанным координа�
         smart_turn(2)
     end
     while pos.x ~= x do
-        os.sleep(0)
+        os.sleep()
         forward()
         if need_swing then
             robot.swing()
@@ -142,7 +142,7 @@ function go(y, x, z) -- переход по указанным координа�
         smart_turn(1)
     end
     while pos.z ~= z do
-        os.sleep(0)
+        os.sleep()
         forward()
         if need_swing then
             robot.swing()
